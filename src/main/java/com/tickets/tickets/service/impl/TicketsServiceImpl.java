@@ -10,13 +10,18 @@ import com.google.gson.JsonSyntaxException;
 import com.thoughtworks.xstream.XStream;
 import com.tickets.tickets.service.TicketsService;
 
+import net.dongliu.requests.RawResponse;
 import net.dongliu.requests.Requests;
 import net.dongliu.requests.Session;
 
 public class TicketsServiceImpl implements TicketsService {
 	
+	
 	Session session = Requests.session();
 	XStream xs = new XStream();
+	
+	
+	
 	@Override
 	public void login12306() {
 		String url1 ="https://kyfw.12306.cn/otn/passport?redirect=/otn/";
@@ -28,39 +33,28 @@ public class TicketsServiceImpl implements TicketsService {
 	
 	
 	public void toLogin() {
-		Map<String, Object> cookMap = new HashMap();
-		cookMap.put("RAIL_EXPIRATION", "1516653250781");
-		cookMap.put("RAIL_DEVICEID", "aOlcdnbOkZk1M_t90VHz_UahJb4z_bhqp5vZSBI2LRJMDvz6-de4hGiGIzm4ftGiE-n4EIdv9bd9V1Tt0n9e7gtaKshFCV4-wVnaWIwhGUSnpbDCrX_sye9sNCyopn70I-TTxKJc-u9DWM58zaJB5PWN0gW_ng5Q");
 			
 		String url ="https://kyfw.12306.cn/otn/login/init";
-		session.get(url).verify(false).headers(getHeaders()).cookies(cookMap).send();
-		
-		//Requests.get(url).verify(false).headers(getHeaders()).cookies(cookMap).send().readToText();
-		
-		//String urlcook = "https://kyfw.12306.cn/otn/HttpZF/GetJS";
-		//session.get(urlcook).verify(false).headers(getHeaders()).send();
-		
-		
+		session.get(url).verify(false).headers(getHeaders()).cookies(getCookMap()).send();
+
 		//验证码处理'
 		boolean booleanCaptcha = getCaptcha();
 		
-		System.out.println(xs.toXML(session.currentCookies()));
-	//	while(!booleanCaptcha) {
-	//		booleanCaptcha = getCaptcha();
-	//	}
+		while(!booleanCaptcha) {
+			booleanCaptcha = getCaptcha();
+		}
 		//登录
-//		Map<String, Object> map = new HashMap<>();
-//		map.put("username", "l18622091327");
-//		map.put("password", "li1861327");
-//		map.put("appid", "otn");
+		Map<String, Object> map = new HashMap<>();
+		map.put("username", "l18622091327");
+		map.put("password", "li1861327");
+		map.put("appid", "otn");
 		
 		
-//		url = "https://kyfw.12306.cn/passport/web/login";
-		//System.out.println(xs.toXML(session));
-		//String resp =session.post(url).verify(false).headers(getHeaders()).forms(map).send().readToText();
-	//	String resp =session.post(url).verify(false).forms(map).send().readToText();
+		url = "https://kyfw.12306.cn/passport/web/login";
+		String resp =session.post(url).verify(false).headers(getHeaders()).cookies(getCookMap()).forms(map).send().readToText();
+		//String resp =session.post(url).verify(false).forms(map).send().readToText();
 		
-	//	System.out.println(resp);
+		System.out.println(resp);
 	}
 	
 	
@@ -132,6 +126,16 @@ public class TicketsServiceImpl implements TicketsService {
 		headers.put("Referer", "https://kyfw.12306.cn/otn/passport?redirect=/otn/");
 		return headers;
 	}
+	
+	public Map getCookMap(){
+		Map<String, Object> cookMap = new HashMap();
+		cookMap.put("RAIL_EXPIRATION", "1516653250781");
+		cookMap.put("RAIL_DEVICEID", "aOlcdnbOkZk1M_t90VHz_UahJb4z_bhqp5vZSBI2LRJMDvz6-de4hGiGIzm4ftGiE-n4EIdv9bd9V1Tt0n9e7gtaKshFCV4-wVnaWIwhGUSnpbDCrX_sye9sNCyopn70I-TTxKJc-u9DWM58zaJB5PWN0gW_ng5Q");
+		return cookMap;
+	}
+	
+	
+	
 	
 	public static void main(String[]args) {
 		TicketsServiceImpl i = new TicketsServiceImpl();
