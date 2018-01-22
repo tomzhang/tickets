@@ -19,7 +19,8 @@ public class TicketsServiceImpl implements TicketsService {
 	
 	Session session = Requests.session();
 	XStream xs = new XStream();
-	
+	String[] strs = new String[]{"35,35","105,35","175,35","245,35","35,105","105,105","175,105","245,105"};
+	Gson gson = new Gson();
 	
 	
 	@Override
@@ -52,9 +53,29 @@ public class TicketsServiceImpl implements TicketsService {
 		
 		url = "https://kyfw.12306.cn/passport/web/login";
 		String resp =session.post(url).verify(false).headers(getHeaders()).cookies(getCookMap()).forms(map).send().readToText();
-		//String resp =session.post(url).verify(false).forms(map).send().readToText();
 		
-		System.out.println(resp);
+		
+		Map<String,Object> uamtkMap = new HashMap();
+		uamtkMap.put("appid", "otn");
+	    url = "https://kyfw.12306.cn/passport/web/auth/uamtk";
+		String resp_uamtk =session.post(url).verify(false).headers(getHeaders()).cookies(getCookMap()).forms(uamtkMap).send().readToText();
+		System.out.println(resp_uamtk);
+		Map<String,String> resutUamtkMap = gson.fromJson(resp_uamtk, HashMap.class);
+		String newapptk = resutUamtkMap.get("newapptk");
+		
+		
+		Map<String,Object> uamauthclientMap = new HashMap();
+		uamtkMap.put("tk", newapptk);
+		url = "https://kyfw.12306.cn/otn/uamauthclient";
+		String resp_uamauthclient = session.post(url).verify(false).headers(getHeaders()).cookies(getCookMap()).forms(uamauthclientMap).send().readToText();
+		
+		System.out.println(resp_uamauthclient);
+		
+		 url = "https://kyfw.12306.cn/otn/index/initMy12306";
+		 String sucess = session.get(url).verify(false).headers(getHeaders()).cookies(getCookMap()).send().readToText();
+		 
+		
+		System.out.println(sucess);
 	}
 	
 	
@@ -91,6 +112,7 @@ public class TicketsServiceImpl implements TicketsService {
 			System.out.println("请输入验证码：");
 			Scanner scan = new Scanner(System.in);
 			String read = scan.nextLine();
+			read = getPostion(read);
 			System.out.println("输入的验证码："+read); 
 			Map<String, Object> map = new HashMap<>();
 			map.put("answer", read);
@@ -101,7 +123,7 @@ public class TicketsServiceImpl implements TicketsService {
 			String resp =session.post(url).verify(false).headers(getHeaders()).forms(map).send().readToText();		
 			System.out.println("输出结果："+resp);
 			
-			Gson gson = new Gson();
+			
 			Map<String,String> resMap = gson.fromJson(resp, HashMap.class);
 			String result_code = resMap.get("result_code");
 			if("4".equals(result_code)) {
@@ -134,7 +156,21 @@ public class TicketsServiceImpl implements TicketsService {
 		return cookMap;
 	}
 	
-	
+	public String getPostion(String inputs){	
+		String result ="";
+		if(inputs.equals("")|| inputs==null){
+			return result;
+		}else{
+			String[] inputArray =  inputs.split(",");
+			for(int i=0;i<inputArray.length;i++){
+				result+= strs[Integer.valueOf(inputArray[i])]+",";
+			}
+			if(result.endsWith(",")){
+				result = result.substring(0,result.length()-1);
+			}
+			return result;
+		}
+	}
 	
 	
 	public static void main(String[]args) {
