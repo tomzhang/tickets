@@ -10,7 +10,6 @@ import com.google.gson.JsonSyntaxException;
 import com.thoughtworks.xstream.XStream;
 import com.tickets.tickets.service.TicketsService;
 
-import net.dongliu.requests.RawResponse;
 import net.dongliu.requests.Requests;
 import net.dongliu.requests.Session;
 
@@ -52,14 +51,16 @@ public class TicketsServiceImpl implements TicketsService {
 		
 		
 		url = "https://kyfw.12306.cn/passport/web/login";
-		String resp =session.post(url).verify(false).headers(getHeaders()).cookies(getCookMap()).forms(map).send().readToText();
+		String resp =session.post(url).verify(false).headers(getHeaders()).cookies(getCookMap()).timeout(20*1000).forms(map).send().readToText();
 		
 		
 		Map<String,Object> uamtkMap = new HashMap();
 		uamtkMap.put("appid", "otn");
 	    url = "https://kyfw.12306.cn/passport/web/auth/uamtk";
-		String resp_uamtk =session.post(url).verify(false).headers(getHeaders()).cookies(getCookMap()).forms(uamtkMap).send().readToText();
-		System.out.println(resp_uamtk);
+		String resp_uamtk =session.post(url).verify(false).headers(getHeaders()).cookies(getCookMap()).timeout(20*1000).forms(uamtkMap).send().readToText();
+		System.out.println("uamtk输出结果 "+resp_uamtk);
+		
+		
 		Map<String,String> resutUamtkMap = gson.fromJson(resp_uamtk, HashMap.class);
 		String newapptk = resutUamtkMap.get("newapptk");
 		
@@ -67,15 +68,25 @@ public class TicketsServiceImpl implements TicketsService {
 		Map<String,Object> uamauthclientMap = new HashMap();
 		uamtkMap.put("tk", newapptk);
 		url = "https://kyfw.12306.cn/otn/uamauthclient";
-		String resp_uamauthclient = session.post(url).verify(false).headers(getHeaders()).cookies(getCookMap()).forms(uamauthclientMap).send().readToText();
+		String resp_uamauthclient = session.post(url).verify(false).headers(getHeaders()).cookies(getCookMap()).timeout(20*1000).forms(uamauthclientMap).send().readToText();
 		
-		System.out.println(resp_uamauthclient);
+		//System.out.println("uamauthclient输出结果 "+resp_uamauthclient);
 		
 		 url = "https://kyfw.12306.cn/otn/index/initMy12306";
-		 String sucess = session.get(url).verify(false).headers(getHeaders()).cookies(getCookMap()).send().readToText();
+		 String loginSucess = session.get(url).verify(false).headers(getHeaders()).cookies(getCookMap()).timeout(20*1000).send().readToText();
 		 
 		
-		System.out.println(sucess);
+		//System.out.println(sucess);
+		 
+		 //#==================================================获取联系人====================================================================
+		url ="https://kyfw.12306.cn/otn/passengers/init"; 
+		Map passengerscookMap = getCookMap();
+		passengerscookMap.put("tk", newapptk);
+		String res_passengers= session.post(url).verify(false).headers(getHeaders()).cookies(passengerscookMap).timeout(20*1000).forms(uamauthclientMap).send().readToText();
+		String passengers_json = res_passengers.substring(res_passengers.indexOf("[{'passenger_type_name'"), res_passengers.indexOf("'}];")+3);
+		System.out.println("常用联系人信息为："+passengers_json);
+		
+		
 	}
 	
 	
@@ -109,7 +120,18 @@ public class TicketsServiceImpl implements TicketsService {
 	public boolean checkCaptcha() {
 		boolean flag = false;
 		try {
-			System.out.println("请输入验证码：");
+			System.out.println("#=======================================================================  ");
+			System.out.println("#根据打开的图片识别验证码后手动输入，输入正确验证码对应的位置，例如：2,5  ");
+			System.out.println("# ---------------------------------------   ");
+			System.out.println("#         |         |         |  ");
+			System.out.println("#    0    |    1    |    2    |     3  ");
+			System.out.println("#         |         |         |  ");
+			System.out.println("# ---------------------------------------  ");
+			System.out.println("#         |         |         |  ");
+			System.out.println("#    4    |    5    |    6    |     7  ");
+			System.out.println("#         |         |         |  ");
+			System.out.println("# ---------------------------------------  ");
+			System.out.println(" #=======================================================================  ");
 			Scanner scan = new Scanner(System.in);
 			String read = scan.nextLine();
 			read = getPostion(read);
@@ -151,8 +173,8 @@ public class TicketsServiceImpl implements TicketsService {
 	
 	public Map getCookMap(){
 		Map<String, Object> cookMap = new HashMap();
-		cookMap.put("RAIL_EXPIRATION", "1516653250781");
-		cookMap.put("RAIL_DEVICEID", "aOlcdnbOkZk1M_t90VHz_UahJb4z_bhqp5vZSBI2LRJMDvz6-de4hGiGIzm4ftGiE-n4EIdv9bd9V1Tt0n9e7gtaKshFCV4-wVnaWIwhGUSnpbDCrX_sye9sNCyopn70I-TTxKJc-u9DWM58zaJB5PWN0gW_ng5Q");
+		cookMap.put("RAIL_EXPIRATION", "1516886821514");
+		cookMap.put("RAIL_DEVICEID", "GIcpOc0_xCDBDN3edj03xmedlacIJKz-caCxzreuIaNZLLXdXSawWPRq3f1Me68G-je7gcE-ayy1NUr3bjHNMJNFyirXuVz_6PeK-ZcHSHcyIOnMSYYSqWJDTZwCA15gAQD_FY6o2ryBv5wAN4WdOSvSXlgYf4is");
 		return cookMap;
 	}
 	
