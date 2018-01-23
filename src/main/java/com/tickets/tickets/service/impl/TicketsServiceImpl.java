@@ -82,10 +82,29 @@ public class TicketsServiceImpl implements TicketsService {
 		url ="https://kyfw.12306.cn/otn/passengers/init"; 
 		Map passengerscookMap = getCookMap();
 		passengerscookMap.put("tk", newapptk);
-		String res_passengers= session.post(url).verify(false).headers(getHeaders()).cookies(passengerscookMap).timeout(20*1000).forms(uamauthclientMap).send().readToText();
+		String res_passengers= session.post(url).verify(false).headers(getHeaders()).cookies(passengerscookMap).timeout(40*1000).forms(uamauthclientMap).send().readToText();
 		String passengers_json = res_passengers.substring(res_passengers.indexOf("[{'passenger_type_name'"), res_passengers.indexOf("'}];")+3);
 		System.out.println("常用联系人信息为："+passengers_json);
 		
+		
+		//#==================================================车票查询====================================================================
+		//南阳-北京
+		passengerscookMap.put("current_captcha_type", "Z");
+		passengerscookMap.put("_jc_save_fromStation", "南阳,NFF");
+		passengerscookMap.put("_jc_save_toStation", "北京,BJP");
+		passengerscookMap.put("_jc_save_fromDate", "2018-02-21");
+		passengerscookMap.put("_jc_save_toDate", "2018-01-23");
+		passengerscookMap.put("_jc_save_wfdc_flag", "dc");
+		url ="https://kyfw.12306.cn/otn/leftTicket/init";
+		session.get(url).verify(false).headers(getHeaders()).cookies(passengerscookMap).timeout(30*1000).send().readToText();
+		url="https://kyfw.12306.cn/otn/dynamicJs/qgdbwtc";
+		session.get(url).verify(false).headers(getHeaders()).cookies(passengerscookMap).timeout(30*1000).send().readToText();
+		
+
+		url ="https://kyfw.12306.cn/otn/leftTicket/queryZ?leftTicketDTO.train_date=2018-02-21&leftTicketDTO.from_station=NFF&leftTicketDTO.to_station=BJP&purpose_codes=ADULT";
+		String leftTicket_info= session.get(url).verify(false).headers(getHeaders()).cookies(passengerscookMap).timeout(30*1000).send().readToText();
+		
+		System.out.println("车票信息："+leftTicket_info);
 		
 	}
 	
@@ -194,12 +213,19 @@ public class TicketsServiceImpl implements TicketsService {
 		}
 	}
 	
+	public void test() {
+		String url ="https://kyfw.12306.cn/otn/leftTicket/queryZ?leftTicketDTO.train_date=2018-02-21&leftTicketDTO.from_station=NFF&leftTicketDTO.to_station=BJP&purpose_codes=ADULT";
+		String leftTicket_info= session.get(url).verify(false).timeout(30*1000).send().readToText();
+		System.out.println(leftTicket_info);
+	}
+	
 	
 	public static void main(String[]args) {
 		TicketsServiceImpl i = new TicketsServiceImpl();
 		i.toLogin();
 		//i.checkCaptcha();
 		//i.getCaptcha();
+		//i.test();
 	}
 	
 
