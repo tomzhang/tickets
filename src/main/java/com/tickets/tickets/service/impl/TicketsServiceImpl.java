@@ -102,9 +102,12 @@ public class TicketsServiceImpl implements TicketsService {
 		
 
 		url ="https://kyfw.12306.cn/otn/leftTicket/queryZ?leftTicketDTO.train_date=2018-02-21&leftTicketDTO.from_station=NFF&leftTicketDTO.to_station=BJP&purpose_codes=ADULT";
-		String leftTicket_info= session.get(url).verify(false).headers(getHeaders()).cookies(passengerscookMap).timeout(30*1000).send().readToText();
-		
+		String leftTicket_info= session.get(url).verify(false).headers(getHeaders()).cookies(passengerscookMap).timeout(30*1000).send().readToText();		
 		System.out.println("车票信息："+leftTicket_info);
+		
+		//
+		
+		
 		
 	}
 	
