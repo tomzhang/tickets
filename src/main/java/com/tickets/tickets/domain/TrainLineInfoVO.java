@@ -1,0 +1,185 @@
+package com.tickets.tickets.domain;
+
+public class TrainLineInfoVO {
+	
+	private String secretStr;           //订单请求时使用
+	private String train_no;         //获取价格，获取车次车站信息使用
+	private String status;              //状态  
+	private String flag;               //序号
+	private String station_train_code; //车次
+	private String from_station_name;  //出发站点 
+	private String to_station_name;    //到达站点
+	private String start_time;		  // 发车时间
+	private String arrive_time;		  //到达时间
+	private String duration; 		 //历时
+	private String swz_num;			 //商务座/特等座
+	private String zy_num; 			//一等座
+	private String ze_num;			//二等座
+	private String rw_num; 			//软卧
+	private String yw_num; 			//硬卧
+	private String yz_num;			//硬座
+	private String wz_num;			//无座
+	
+	//车次价格
+	private String swz_num_price;			 //商务座/特等座
+	private String zy_num_price; 			//一等座
+	private String ze_num_price;			//二等座
+	private String rw_num_price; 			//软卧
+	private String yw_num_price; 			//硬卧
+	private String yz_num_price;			//硬座
+	private String wz_num_price;			//无座
+	
+	public String getSecretStr() {
+		return secretStr;
+	}
+	public void setSecretStr(String secretStr) {
+		this.secretStr = secretStr;
+	}
+	public String getTrain_no() {
+		return train_no;
+	}
+	public void setTrain_no(String train_no) {
+		this.train_no = train_no;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public String getFlag() {
+		return flag;
+	}
+	public void setFlag(String flag) {
+		this.flag = flag;
+	}
+	public String getStation_train_code() {
+		return station_train_code;
+	}
+	public void setStation_train_code(String station_train_code) {
+		this.station_train_code = station_train_code;
+	}
+	public String getFrom_station_name() {
+		return from_station_name;
+	}
+	public void setFrom_station_name(String from_station_name) {
+		this.from_station_name = from_station_name;
+	}
+	public String getTo_station_name() {
+		return to_station_name;
+	}
+	public void setTo_station_name(String to_station_name) {
+		this.to_station_name = to_station_name;
+	}
+	public String getStart_time() {
+		return start_time;
+	}
+	public void setStart_time(String start_time) {
+		this.start_time = start_time;
+	}
+	public String getArrive_time() {
+		return arrive_time;
+	}
+	public void setArrive_time(String arrive_time) {
+		this.arrive_time = arrive_time;
+	}
+	public String getDuration() {
+		return duration;
+	}
+	public void setDuration(String duration) {
+		this.duration = duration;
+	}
+	public String getSwz_num() {
+		return swz_num;
+	}
+	public void setSwz_num(String swz_num) {
+		this.swz_num = swz_num;
+	}
+	public String getZy_num() {
+		return zy_num;
+	}
+	public void setZy_num(String zy_num) {
+		this.zy_num = zy_num;
+	}
+	public String getZe_num() {
+		return ze_num;
+	}
+	public void setZe_num(String ze_num) {
+		this.ze_num = ze_num;
+	}
+	public String getRw_num() {
+		return rw_num;
+	}
+	public void setRw_num(String rw_num) {
+		this.rw_num = rw_num;
+	}
+	public String getYw_num() {
+		return yw_num;
+	}
+	public void setYw_num(String yw_num) {
+		this.yw_num = yw_num;
+	}
+	public String getYz_num() {
+		return yz_num;
+	}
+	public void setYz_num(String yz_num) {
+		this.yz_num = yz_num;
+	}
+	public String getWz_num() {
+		return wz_num;
+	}
+	public void setWz_num(String wz_num) {
+		this.wz_num = wz_num;
+	}
+	public String getSwz_num_price() {
+		return swz_num_price;
+	}
+	public void setSwz_num_price(String swz_num_price) {
+		this.swz_num_price = swz_num_price;
+	}
+	public String getZy_num_price() {
+		return zy_num_price;
+	}
+	public void setZy_num_price(String zy_num_price) {
+		this.zy_num_price = zy_num_price;
+	}
+	public String getZe_num_price() {
+		return ze_num_price;
+	}
+	public void setZe_num_price(String ze_num_price) {
+		this.ze_num_price = ze_num_price;
+	}
+	public String getRw_num_price() {
+		return rw_num_price;
+	}
+	public void setRw_num_price(String rw_num_price) {
+		this.rw_num_price = rw_num_price;
+	}
+	public String getYw_num_price() {
+		return yw_num_price;
+	}
+	public void setYw_num_price(String yw_num_price) {
+		this.yw_num_price = yw_num_price;
+	}
+	public String getYz_num_price() {
+		return yz_num_price;
+	}
+	public void setYz_num_price(String yz_num_price) {
+		this.yz_num_price = yz_num_price;
+	}
+	public String getWz_num_price() {
+		return wz_num_price;
+	}
+	public void setWz_num_price(String wz_num_price) {
+		this.wz_num_price = wz_num_price;
+	}
+	
+	
+	
+	
+	
+
+
+	
+	
+}
