@@ -2,23 +2,37 @@ package com.tickets.tickets.domain;
 
 public class TrainLineInfoVO {
 	
-	private String secretStr;           //订单请求时使用
+	private String secretStr;           //订单请求时使用 秘钥字符串
 	private String train_no;         //获取价格，获取车次车站信息使用
-	private String status;              //状态  
+	private String status;              //操作状态
 	private String flag;               //序号
 	private String station_train_code; //车次
+	private String from_station_y_code; //列车始发站code
+	private String from_station_y_name; //列车始发站name
+	private String to_station_y_code;   //列车终点站code
+	private String to_station_y_name;   //列车终点站name
+	private String from_station_code;  //出发站点 
 	private String from_station_name;  //出发站点 
+	private String to_station_code;    //到达站点
 	private String to_station_name;    //到达站点
+	private String isBuy;			   //是否可购买
+	
 	private String start_time;		  // 发车时间
 	private String arrive_time;		  //到达时间
 	private String duration; 		 //历时
+	
 	private String swz_num;			 //商务座/特等座
 	private String zy_num; 			//一等座
 	private String ze_num;			//二等座
+	private String gjrw_num;			//高级软卧
 	private String rw_num; 			//软卧
 	private String yw_num; 			//硬卧
+	private String rz_num;			//软座
+	private String dw_num;			//动卧
 	private String yz_num;			//硬座
 	private String wz_num;			//无座
+	private String qt_num;			//其它
+	
 	
 	//车次价格
 	private String swz_num_price;			 //商务座/特等座
@@ -28,6 +42,10 @@ public class TrainLineInfoVO {
 	private String yw_num_price; 			//硬卧
 	private String yz_num_price;			//硬座
 	private String wz_num_price;			//无座
+	private String rz_num_price;			//软座
+	private String qt_num_price;			//其它
+	private String gjrw_num_price;			//高级软卧
+	private String dw_num_price;			//动卧
 	
 	public String getSecretStr() {
 		return secretStr;
@@ -172,6 +190,96 @@ public class TrainLineInfoVO {
 	}
 	public void setWz_num_price(String wz_num_price) {
 		this.wz_num_price = wz_num_price;
+	}
+	public String getFrom_station_y_code() {
+		return from_station_y_code;
+	}
+	public void setFrom_station_y_code(String from_station_y_code) {
+		this.from_station_y_code = from_station_y_code;
+	}
+	public String getFrom_station_y_name() {
+		return from_station_y_name;
+	}
+	public void setFrom_station_y_name(String from_station_y_name) {
+		this.from_station_y_name = from_station_y_name;
+	}
+	public String getTo_station_y_code() {
+		return to_station_y_code;
+	}
+	public void setTo_station_y_code(String to_station_y_code) {
+		this.to_station_y_code = to_station_y_code;
+	}
+	public String getTo_station_y_name() {
+		return to_station_y_name;
+	}
+	public void setTo_station_y_name(String to_station_y_name) {
+		this.to_station_y_name = to_station_y_name;
+	}
+	public String getFrom_station_code() {
+		return from_station_code;
+	}
+	public void setFrom_station_code(String from_station_code) {
+		this.from_station_code = from_station_code;
+	}
+	public String getTo_station_code() {
+		return to_station_code;
+	}
+	public String getIsBuy() {
+		return isBuy;
+	}
+	public void setIsBuy(String isBuy) {
+		this.isBuy = isBuy;
+	}
+	public void setTo_station_code(String to_station_code) {
+		this.to_station_code = to_station_code;
+	}
+	public String getRz_num() {
+		return rz_num;
+	}
+	public void setRz_num(String rz_num) {
+		this.rz_num = rz_num;
+	}
+	public String getRz_num_price() {
+		return rz_num_price;
+	}
+	public void setRz_num_price(String rz_num_price) {
+		this.rz_num_price = rz_num_price;
+	}
+	public String getQt_num() {
+		return qt_num;
+	}
+	public void setQt_num(String qt_num) {
+		this.qt_num = qt_num;
+	}
+	public String getQt_num_price() {
+		return qt_num_price;
+	}
+	public void setQt_num_price(String qt_num_price) {
+		this.qt_num_price = qt_num_price;
+	}
+	public String getGjrw_num() {
+		return gjrw_num;
+	}
+	public void setGjrw_num(String gjrw_num) {
+		this.gjrw_num = gjrw_num;
+	}
+	public String getDw_num() {
+		return dw_num;
+	}
+	public void setDw_num(String dw_num) {
+		this.dw_num = dw_num;
+	}
+	public String getGjrw_num_price() {
+		return gjrw_num_price;
+	}
+	public void setGjrw_num_price(String gjrw_num_price) {
+		this.gjrw_num_price = gjrw_num_price;
+	}
+	public String getDw_num_price() {
+		return dw_num_price;
+	}
+	public void setDw_num_price(String dw_num_price) {
+		this.dw_num_price = dw_num_price;
 	}
 	
 	

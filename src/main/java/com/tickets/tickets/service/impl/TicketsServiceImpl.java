@@ -19,6 +19,7 @@ import com.tickets.tickets.domain.TrainInfoVO;
 import com.tickets.tickets.domain.TrainLineInfoVO;
 import com.tickets.tickets.domain.TrainStationInfoVO;
 import com.tickets.tickets.service.TicketsService;
+import com.tickets.tickets.utils.StationDataUtils;
 
 import net.dongliu.requests.Requests;
 import net.dongliu.requests.Session;
@@ -27,7 +28,7 @@ public class TicketsServiceImpl implements TicketsService {
 	
 	
 	Session session = Requests.session();
-	XStream xs = new XStream();
+	static XStream xs = new XStream();
 	String[] strs = new String[]{"35,35","105,35","175,35","245,35","35,105","105,105","175,105","245,105"};
 	private static Gson gson = new Gson();
 	
@@ -316,11 +317,41 @@ public class TicketsServiceImpl implements TicketsService {
           for(String trainInfo:result_trains) {
         	 String[] sp = trainInfo.split("\\|");
         	 TrainLineInfoVO trainLineInfo = new TrainLineInfoVO();
+        	 
         	 trainLineInfo.setSecretStr(sp[0]); //订单请求时使用
         	 trainLineInfo.setStatus(sp[1]); //状态
         	 trainLineInfo.setTrain_no(sp[2]); //获取价格，获取车次车站信息使用
         	 trainLineInfo.setStation_train_code(sp[3]); //车次
-        	// train_no
+        	 trainLineInfo.setFrom_station_y_code(sp[4]); //列车始发站code
+        	 trainLineInfo.setFrom_station_y_name(StationDataUtils.getstation_name(sp[4]));
+        	 trainLineInfo.setTo_station_y_code(sp[5]); //列车终点站code
+        	 trainLineInfo.setTo_station_y_name(StationDataUtils.getstation_name(sp[5]));
+        	 trainLineInfo.setFrom_station_code(sp[6]);//出发站点 
+        	 trainLineInfo.setFrom_station_name(StationDataUtils.getstation_name(sp[6]));
+        	 trainLineInfo.setTo_station_code(sp[7]); //到站点
+        	 trainLineInfo.setTo_station_name(StationDataUtils.getstation_name(sp[7]));
+        	 trainLineInfo.setStart_time(sp[8]); //出发时间点
+        	 trainLineInfo.setArrive_time(sp[9]);//到达时间
+        	 trainLineInfo.setDuration(sp[10]); //历时
+        	 trainLineInfo.setIsBuy(sp[11]); //是否可预定
+        	 
+        	 
+        	//座位信息
+    	 	trainLineInfo.setSwz_num(sp[32]);  //商务座/特等座
+    		trainLineInfo.setZy_num(sp[31]); //一等座
+    		trainLineInfo.setZe_num(sp[30]);//二等座
+    		trainLineInfo.setGjrw_num(sp[21]);//高级软卧---
+    		trainLineInfo.setRw_num(sp[23]); //软卧
+    		trainLineInfo.setDw_num(sp[33]); //动卧--
+    		trainLineInfo.setYw_num(sp[28]);//硬卧
+    		trainLineInfo.setRz_num(sp[24]);//软座
+    		trainLineInfo.setYz_num(sp[29]); //硬座
+    		trainLineInfo.setWz_num(sp[26]);//无座
+    		trainLineInfo.setQt_num(sp[22]);//其它----
+        	
+        	 
+        	 System.out.println(xs.toXML(trainLineInfo));
+          
           }
             
          
@@ -331,6 +362,7 @@ public class TicketsServiceImpl implements TicketsService {
             e.printStackTrace();  
         } 
 	}
+	
 	
 
 }
