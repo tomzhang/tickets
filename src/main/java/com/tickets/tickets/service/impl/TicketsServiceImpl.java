@@ -272,12 +272,12 @@ public class TicketsServiceImpl implements TicketsService {
 	
 	public static void main(String[]args) throws Exception {
 		TicketsServiceImpl i = new TicketsServiceImpl();
-		//i.toLogin();
+		i.toLogin();
 		//i.checkCaptcha();
 		//i.getCaptcha();
 		//i.test2();
 		//i.homePage();
-		jiexi();
+		//jiexi();
 
 	}
 	
