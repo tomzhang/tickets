@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
+import org.springframework.stereotype.Service;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.thoughtworks.xstream.XStream;
@@ -24,22 +26,25 @@ import com.tickets.tickets.utils.StationDataUtils;
 import net.dongliu.requests.Requests;
 import net.dongliu.requests.Session;
 
+@Service
 public class TicketsServiceImpl implements TicketsService {
 	
-	
-	Session session = Requests.session();
+	static	Session session = Requests.session();
 	static XStream xs = new XStream();
 	String[] strs = new String[]{"35,35","105,35","175,35","245,35","35,105","105,105","175,105","245,105"};
 	private static Gson gson = new Gson();
+	static 	Map passengerscookMap = null;
+	static TrainInfoVO trainInfoVO=null;
 	
 	
 	@Override
 	public void login12306() {
-		String url1 ="https://kyfw.12306.cn/otn/passport?redirect=/otn/";
-		String resp1 = session.get(url1).verify(false).headers(getHeaders()).timeout(20*1000).send().readToText();
+		//String url1 ="https://kyfw.12306.cn/otn/passport?redirect=/otn/";
+		//String resp1 = session.get(url1).verify(false).headers(getHeaders()).timeout(20*1000).send().readToText();
 		
 		//System.out.println(resp1);
-		System.out.println(xs.toXML(session));
+		//System.out.println(xs.toXML(session));
+		toLogin();
 	}
 	
 	
@@ -91,7 +96,7 @@ public class TicketsServiceImpl implements TicketsService {
 		 
 		 //#==================================================获取联系人====================================================================
 		url ="https://kyfw.12306.cn/otn/passengers/init"; 
-		Map passengerscookMap = getCookMap();
+	    passengerscookMap = getCookMap();
 		passengerscookMap.put("tk", newapptk);
 		String res_passengers= session.post(url).verify(false).headers(getHeaders()).cookies(passengerscookMap).timeout(40*1000).forms(uamauthclientMap).send().readToText();
 		String passengers_json = res_passengers.substring(res_passengers.indexOf("[{'passenger_type_name'"), res_passengers.indexOf("'}];")+3);
@@ -111,36 +116,7 @@ public class TicketsServiceImpl implements TicketsService {
 		url="https://kyfw.12306.cn/otn/dynamicJs/qgdbwtc";
 		session.get(url).verify(false).headers(getHeaders()).cookies(passengerscookMap).timeout(30*1000).send().readToText();
 		
-
-		url ="https://kyfw.12306.cn/otn/leftTicket/queryZ?leftTicketDTO.train_date=2018-02-20&leftTicketDTO.from_station=BJP&leftTicketDTO.to_station=TJP&purpose_codes=ADULT";
-		String leftTicket_info= session.get(url).verify(false).headers(getHeaders()).cookies(passengerscookMap).timeout(30*1000).send().readToText();		
-		System.out.println("车票信息："+leftTicket_info);
-		
-		//#==================================================购票====================================================================
-		//checkUser
-		
-		passengerscookMap.put("acw_tc", "AQAAABYlIhI3IAYAWgpRKn++Jm3h7s9v");
-		url ="https://kyfw.12306.cn/otn/login/checkUser";
-		
-		Map<String,Object> checkUserMap = new HashMap();
-		checkUserMap.put("_json_att", "");
-		
-		String checkUser_rpInfo =session.post(url).verify(false).headers(getHeaders()).cookies(passengerscookMap).forms(checkUserMap).timeout(30*1000).send().readToText();		
-		System.out.println("checkUser校验消息:"+checkUser_rpInfo);
-		
-		url="https://kyfw.12306.cn/otn/leftTicket/submitOrderRequest";
-		Map<String,Object> submitOrderMap = new HashMap();
-		//secretStr 取数有问题，如何取到 是一个问题
-		submitOrderMap.put("secretStr", "LiG+qj4KwpVp0OEdoVXc/0hMPFxs1HzpcGsQ9cTUtrDjjAWvlWVNOeM3g3Vflybew6syQSTYc5FeJ5ndx1NRzIKnUv6aZyEu9sodSjnHsnPNHRDKoQsZkvP67S2yqBM1c0+iJOnmElNzYOc9WMoMPZ7StRgeEIGcTBsud8whVS2Niw8pGtizQDFteQC/74fdsQpxw8452T2jY63EhPg9Ro+V5Vj8bEAX1d7Jhy39bKmdyqDEmluUsaYw6PZN4D3gBmux27kBvWY=");
-		submitOrderMap.put("train_date", "2018-02-20");
-		submitOrderMap.put("back_train_date", "2018-01-24");
-		submitOrderMap.put("tour_flag", "dc");
-		submitOrderMap.put("purpose_codes", "ADULT");
-		submitOrderMap.put("query_from_station_name", "北京");
-		submitOrderMap.put("query_to_station_name", "天津");
-		submitOrderMap.put("undefined", "");
-		String submitOrderRequest_rpInfo =session.post(url).verify(false).headers(getHeaders()).cookies(passengerscookMap).forms(submitOrderMap).timeout(30*1000).send().readToText();		
-		System.out.println("submitOrderRequest信息："+submitOrderRequest_rpInfo);
+		System.out.println("登录成功，session hashcode:"+session.hashCode());
 		
 		
 	}
@@ -282,6 +258,81 @@ public class TicketsServiceImpl implements TicketsService {
 	}
 	
 	
+	/**
+	 * 将车票返回信息实例化
+	 * @param json 
+	 * @return
+	 */
+	private TrainInfoVO getTrainInfoVO(String json) {
+	   Map mapRoot = gson.fromJson( json, HashMap.class);
+       Map<String,Object> mapdata =  (Map) mapRoot.get("data");
+       
+       String flag= (String) mapdata.get("flag");
+       
+       //获取mp中的值
+       Map<String,String> map_jsonMap = (Map) mapdata.get("map");
+       
+       List<TrainStationInfoVO> trainStationInfos = new ArrayList<TrainStationInfoVO>();
+       Set<String> set = map_jsonMap.keySet(); //取出所有的key值
+       for (String key:set) {
+       	TrainStationInfoVO trainStationInfo = new TrainStationInfoVO();
+       	trainStationInfo.setCode(key);
+       	trainStationInfo.setName(map_jsonMap.get(key));
+       	trainStationInfos.add(trainStationInfo);
+       }
+       
+       //获取result中的值
+       List<String> result_trains =  (ArrayList) mapdata.get("result");
+       
+       List< TrainLineInfoVO> trainLineInfos = new ArrayList();
+       
+      for(String trainInfo:result_trains) {
+    	 String[] sp = trainInfo.split("\\|");
+    	 TrainLineInfoVO trainLineInfo = new TrainLineInfoVO();
+    	 
+    	 trainLineInfo.setSecretStr(sp[0]); //订单请求时使用
+    	 trainLineInfo.setStatus(sp[1]); //状态
+    	 trainLineInfo.setTrain_no(sp[2]); //获取价格，获取车次车站信息使用
+    	 trainLineInfo.setStation_train_code(sp[3]); //车次
+    	 trainLineInfo.setFrom_station_y_code(sp[4]); //列车始发站code
+    	 trainLineInfo.setFrom_station_y_name(StationDataUtils.getstation_name(sp[4]));
+    	 trainLineInfo.setTo_station_y_code(sp[5]); //列车终点站code
+    	 trainLineInfo.setTo_station_y_name(StationDataUtils.getstation_name(sp[5]));
+    	 trainLineInfo.setFrom_station_code(sp[6]);//出发站点 
+    	 trainLineInfo.setFrom_station_name(StationDataUtils.getstation_name(sp[6]));
+    	 trainLineInfo.setTo_station_code(sp[7]); //到站点
+    	 trainLineInfo.setTo_station_name(StationDataUtils.getstation_name(sp[7]));
+    	 trainLineInfo.setStart_time(sp[8]); //出发时间点
+    	 trainLineInfo.setArrive_time(sp[9]);//到达时间
+    	 trainLineInfo.setDuration(sp[10]); //历时
+    	 trainLineInfo.setIsBuy(sp[11]); //是否可预定
+    	 
+    	//座位信息
+	 	trainLineInfo.setSwz_num(sp[32]);  //商务座/特等座
+		trainLineInfo.setZy_num(sp[31]); //一等座
+		trainLineInfo.setZe_num(sp[30]);//二等座
+		trainLineInfo.setGjrw_num(sp[21]);//高级软卧---
+		trainLineInfo.setRw_num(sp[23]); //软卧
+		trainLineInfo.setDw_num(sp[33]); //动卧--
+		trainLineInfo.setYw_num(sp[28]);//硬卧
+		trainLineInfo.setRz_num(sp[24]);//软座
+		trainLineInfo.setYz_num(sp[29]); //硬座
+		trainLineInfo.setWz_num(sp[26]);//无座
+		trainLineInfo.setQt_num(sp[22]);//其它----
+    	
+    	 
+		trainLineInfos.add(trainLineInfo);
+      }
+       
+      TrainInfoVO trainInfoVO = new TrainInfoVO();
+      trainInfoVO.setFlag(flag);
+      trainInfoVO.setTrainLineInfos(trainLineInfos);
+      trainInfoVO.setTrainStationInfos(trainStationInfos);
+           
+	  return trainInfoVO;
+	}
+	
+	
 	public static void jiexi() {
 		 File file = new File("E:/data.txt");  
         Long filelength = file.length();  
@@ -362,6 +413,52 @@ public class TicketsServiceImpl implements TicketsService {
             e.printStackTrace();  
         } 
 	}
+
+
+	@Override
+	public TrainInfoVO query() {
+		System.out.println("车票查询，session hashcode:"+session.hashCode());
+		String url ="https://kyfw.12306.cn/otn/leftTicket/queryZ?leftTicketDTO.train_date=2018-02-20&leftTicketDTO.from_station=BJP&leftTicketDTO.to_station=TJP&purpose_codes=ADULT";
+		String leftTicket_info= session.get(url).verify(false).headers(getHeaders()).cookies(passengerscookMap).timeout(30*1000).send().readToText();		
+		System.out.println("车票信息："+leftTicket_info);
+		trainInfoVO = getTrainInfoVO(leftTicket_info);
+		return trainInfoVO;
+		
+	}
+
+
+	@Override
+	public void buyTicket() {
+		
+		//#==================================================购票====================================================================
+		//checkUser
+		passengerscookMap.put("acw_tc", "AQAAAPfkuVXZUA0AWgpRKhi69R8ktEex");
+		String url ="https://kyfw.12306.cn/otn/login/checkUser";
+		
+		Map<String,Object> checkUserMap = new HashMap();
+		checkUserMap.put("_json_att", "");
+		
+		String checkUser_rpInfo =session.post(url).verify(false).headers(getHeaders()).cookies(passengerscookMap).forms(checkUserMap).timeout(30*1000).send().readToText();		
+		System.out.println("checkUser校验消息:"+checkUser_rpInfo);
+		
+		List<TrainLineInfoVO> trainvos = trainInfoVO.getTrainLineInfos();
+
+		
+		url="https://kyfw.12306.cn/otn/leftTicket/submitOrderRequest";
+		Map<String,Object> submitOrderMap = new HashMap();
+		//secretStr 取数有问题，如何取到 是一个问题
+		submitOrderMap.put("secretStr", trainvos.get(3).getSecretStr());
+		submitOrderMap.put("train_date", "2018-02-20");
+		submitOrderMap.put("back_train_date", "2018-01-26");
+		submitOrderMap.put("tour_flag", "dc");
+		submitOrderMap.put("purpose_codes", "ADULT");
+		submitOrderMap.put("query_from_station_name", "北京");
+		submitOrderMap.put("query_to_station_name", "天津");
+		submitOrderMap.put("undefined", "");
+		String submitOrderRequest_rpInfo =session.post(url).verify(false).headers(getHeaders()).cookies(passengerscookMap).forms(submitOrderMap).timeout(30*1000).send().readToText();		
+		System.out.println("submitOrderRequest信息："+submitOrderRequest_rpInfo);
+	}
+	
 	
 	
 

@@ -8,12 +8,13 @@ import java.util.Scanner;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.thoughtworks.xstream.XStream;
+import com.tickets.tickets.domain.TrainInfoVO;
 import com.tickets.tickets.service.TicketsService;
 
 import net.dongliu.requests.Requests;
 import net.dongliu.requests.Session;
 
-public class TicketsServiceImpl2 implements TicketsService {
+public class TicketsServiceImpl2 {
 	
 	
 	Session session = Requests.session();
@@ -22,7 +23,6 @@ public class TicketsServiceImpl2 implements TicketsService {
 	Gson gson = new Gson();
 	
 	
-	@Override
 	public void login12306() {
 		String url1 ="https://kyfw.12306.cn/otn/passport?redirect=/otn/";
 		String resp1 = session.get(url1).verify(false).headers(getHeaders()).timeout(20*1000).send().readToText();
@@ -230,6 +230,12 @@ public class TicketsServiceImpl2 implements TicketsService {
 		i.toLogin();
 		//i.checkCaptcha();
 		//i.getCaptcha();
+	}
+
+
+	public TrainInfoVO query() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 
