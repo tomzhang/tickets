@@ -47,8 +47,8 @@ public class TicketsServiceImpl2 {
 		}
 		//登录
 		Map<String, Object> map = new HashMap<>();
-		map.put("username", "l18622091327");
-		map.put("password", "li1861327");
+		map.put("username", "");
+		map.put("password", "");
 		map.put("appid", "otn");
 		
 		
