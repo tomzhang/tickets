@@ -17,6 +17,10 @@ public class TrainLineInfoVO {
 	private String to_station_name;    //到达站点
 	private String isBuy;			   //是否可购买
 	
+	private String leftTicket;   //12位
+	
+	private String trainLocation; //trainLocation 15位
+	
 	private String start_time;		  // 发车时间
 	private String arrive_time;		  //到达时间
 	private String duration; 		 //历时
@@ -46,6 +50,9 @@ public class TrainLineInfoVO {
 	private String qt_num_price;			//其它
 	private String gjrw_num_price;			//高级软卧
 	private String dw_num_price;			//动卧
+	
+	
+	
 	
 	public String getSecretStr() {
 		return secretStr;
@@ -280,6 +287,18 @@ public class TrainLineInfoVO {
 	}
 	public void setDw_num_price(String dw_num_price) {
 		this.dw_num_price = dw_num_price;
+	}
+	public String getLeftTicket() {
+		return leftTicket;
+	}
+	public void setLeftTicket(String leftTicket) {
+		this.leftTicket = leftTicket;
+	}
+	public String getTrainLocation() {
+		return trainLocation;
+	}
+	public void setTrainLocation(String trainLocation) {
+		this.trainLocation = trainLocation;
 	}
 	
 	

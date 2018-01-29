@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -99,11 +100,25 @@ public class TicketTest3 {
 		System.out.print("");
 	}
 	
-	public static void main(String[]args) throws Exception{
+	public static void main3(String[]args) throws Exception{
 		//Tue+Feb+20+2018+00:00:00+GMT+0800
-		SimpleDateFormat sdf = new SimpleDateFormat("EEE+MMM+dd+yyyy+HH:mm:ss", java.util.Locale.US);
-		System.out.println(sdf.format(DateUtils.getDate("2018-03-20 00:00:00"))+"+GMT+0800");
+		//SimpleDateFormat sdf = new SimpleDateFormat("EEE+MMM+dd+yyyy+HH:mm:ss", java.util.Locale.US);
+		//System.out.println(sdf.format(DateUtils.getDate("2018-02-20"))+"+GMT+0800");
 		//System.out.println(new Date());
+	
+		System.out.println(new Date().getTime());
+				
+	}
+	
+	public static void main(String[]args) throws Exception{
+		String json ="{'validateMessagesShowId':'_validatorMessage','status':true,'httpstatus':200,'data':{'queryOrderWaitTimeStatus':true,'count':0,'waitTime':-1,'requestId':6363629901478125142,'waitCount':0,'tourFlag':'dc','orderId':'EH85616799'},'messages':[],'validateMessages':{}}";
+		Gson gson = new Gson();
+		Map<String,Object> json_map = gson.fromJson(json, HashMap.class);
+		Map data_map = (Map) json_map.get("data");
+		String orderId = (String) data_map.get("orderId");
+		System.out.println(orderId);
+		
+		
 	}
 	
 }

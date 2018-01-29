@@ -1,5 +1,6 @@
 package com.tickets.tickets.utils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -12,9 +13,14 @@ public class DateUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Date getDate(String date) throws Exception{
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd 00:00:00");
-		return sdf.parse(date);
+	public static Date getDate(String date){
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			return sdf.parse(date);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return new Date();
 	}
 
 }

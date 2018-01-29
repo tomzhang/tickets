@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import com.tickets.tickets.domain.TrainInfoVO;
 import com.tickets.tickets.domain.TrainLineInfoVO;
 import com.tickets.tickets.domain.TrainStationInfoVO;
 import com.tickets.tickets.service.TicketsService;
+import com.tickets.tickets.utils.DateUtils;
 import com.tickets.tickets.utils.StationDataUtils;
 
 import net.dongliu.requests.Requests;
@@ -45,6 +47,7 @@ public class TicketsServiceImpl implements TicketsService {
 	static Map<String, Object> cookMap = new HashMap();
 	static String submitToken  =""; //提交订单获取联系人时使用
 	static String keyCheckIsChange  =""; //订单确认时使用
+	static String orderId="";		//orderId
 	 
 	
 	
@@ -339,7 +342,8 @@ public class TicketsServiceImpl implements TicketsService {
     	 trainLineInfo.setArrive_time(sp[9]);//到达时间
     	 trainLineInfo.setDuration(sp[10]); //历时
     	 trainLineInfo.setIsBuy(sp[11]); //是否可预定
-    	 
+    	 trainLineInfo.setLeftTicket(sp[12]); // leftTicket
+    	 trainLineInfo.setTrainLocation(sp[15]); //15位
     	//座位信息
 	 	trainLineInfo.setSwz_num(sp[32]);  //商务座/特等座
 		trainLineInfo.setZy_num(sp[31]); //一等座
@@ -463,6 +467,7 @@ public class TicketsServiceImpl implements TicketsService {
 	@Override
 	public void buyTicket() {
 		
+		String seatType = "O";//二等座		
 		//#==================================================购票====================================================================
 		//checkUser
 		//passengerscookMap.put("acw_tc", "AQAAAPfkuVXZUA0AWgpRKhi69R8ktEex");
@@ -483,9 +488,10 @@ public class TicketsServiceImpl implements TicketsService {
 		Map<String,Object> submitOrderMap = new HashMap();
 		
 		String SecretStr= null;
+		TrainLineInfoVO trainvo = trainvos.get(3);
 		try {
 			
-			 SecretStr =  java.net.URLDecoder.decode(trainvos.get(3).getSecretStr(), "UTF-8");
+			 SecretStr =  java.net.URLDecoder.decode(trainvo.getSecretStr(), "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
@@ -536,7 +542,7 @@ public class TicketsServiceImpl implements TicketsService {
 		checkOrderInfo_map.put("bed_level_order_num", "000000000000000000000000000000");
 		
 		PassengerVO pv= passengers.get(2);
-		String passengerTicketStr = "O,"+pv.getPassenger_flag()+","+pv.getPassenger_type()+","+pv.getPassenger_name()+","+ pv.getPassenger_id_type_code() +","+pv.getPassenger_id_no()+","+pv.getMobile_no()+",N";
+		String passengerTicketStr =seatType+ ","+pv.getPassenger_flag()+","+pv.getPassenger_type()+","+pv.getPassenger_name()+","+ pv.getPassenger_id_type_code() +","+pv.getPassenger_id_no()+","+pv.getMobile_no()+",N";
 		checkOrderInfo_map.put("passengerTicketStr", passengerTicketStr);
 		
 		String oldPassengerStr =pv.getPassenger_name()+","+pv.getPassenger_id_type_code()+","+pv.getPassenger_id_no()+","+pv.getPassenger_type()+"_";
@@ -550,11 +556,80 @@ public class TicketsServiceImpl implements TicketsService {
 		String rep_checkOrderInfo = session.post(url).verify(false).headers(ticketHeaderMap).cookies(passengerscookMap).forms(checkOrderInfo_map).timeout(30*1000).send().readToText();
 		System.out.println("checkOrderInfo返回信息："+rep_checkOrderInfo);
 		
-		
-      //getQueueCount
+		//getQueueCount
 		url = "https://kyfw.12306.cn/otn/confirmPassenger/getQueueCount";
+		SimpleDateFormat sdf = new SimpleDateFormat("EEE+MMM+dd+yyyy+HH:mm:ss", java.util.Locale.US);
+		String dateGMT = DateUtils.getDate("2018-02-20")+"+GMT+0800";
+		Map getQueueCount_data_map = new HashMap();
+		getQueueCount_data_map.put("train_date",dateGMT);
+		getQueueCount_data_map.put("train_no",trainvo.getTrain_no());
+		getQueueCount_data_map.put("stationTrainCode", trainvo.getStation_train_code());
+		getQueueCount_data_map.put("seatType", seatType);
+		getQueueCount_data_map.put("fromStationTelecode", trainvo.getFrom_station_code());
+		getQueueCount_data_map.put("toStationTelecode", trainvo.getTo_station_code());
+		getQueueCount_data_map.put("leftTicket", trainvo.getLeftTicket());
+		getQueueCount_data_map.put("purpose_codes", "00");
+		getQueueCount_data_map.put("train_location", trainvo.getTrainLocation());
+		getQueueCount_data_map.put("_json_att", "");
+		getQueueCount_data_map.put("REPEAT_SUBMIT_TOKEN", submitToken);
+		String rep_getQueueCount = session.post(url).verify(false).headers(ticketHeaderMap).cookies(passengerscookMap).forms(getQueueCount_data_map).timeout(30*1000).send().readToText();
+		System.out.println("rep_getQueueCount："+rep_getQueueCount);
 		
-
+		url = "https://kyfw.12306.cn/otn/confirmPassenger/confirmSingleForQueue";
+		Map confirmSingleForQueue_data_map = new HashMap();
+		confirmSingleForQueue_data_map.put("passengerTicketStr",passengerTicketStr);
+		confirmSingleForQueue_data_map.put("oldPassengerStr",   oldPassengerStr);
+		confirmSingleForQueue_data_map.put("randCode",   "");
+		confirmSingleForQueue_data_map.put("purpose_codes",   "00");
+		confirmSingleForQueue_data_map.put("key_check_isChange",   keyCheckIsChange);
+		confirmSingleForQueue_data_map.put("leftTicketStr",   trainvo.getLeftTicket());
+		confirmSingleForQueue_data_map.put("train_location",   trainvo.getTrainLocation());
+		confirmSingleForQueue_data_map.put("choose_seats",   "");
+		confirmSingleForQueue_data_map.put("choose_seats",   "000");
+		confirmSingleForQueue_data_map.put("whatsSelect",   "1");
+		confirmSingleForQueue_data_map.put("roomType",   "00");
+		confirmSingleForQueue_data_map.put("dwAll",   "N");
+		confirmSingleForQueue_data_map.put("_json_att",   "");
+		confirmSingleForQueue_data_map.put("REPEAT_SUBMIT_TOKEN",   submitToken);
+		String rep_confirmSingleForQueue = session.post(url).verify(false).headers(ticketHeaderMap).cookies(passengerscookMap).forms(confirmSingleForQueue_data_map).timeout(30*1000).send().readToText();
+		System.out.println("rep_confirmSingleForQueue："+rep_getQueueCount);
+		
+	
+		//queryOrderWaitTime
+		int waitTimeErrorCount =0;
+		while(waitTimeErrorCount<10) {
+			try {
+			url = "https://kyfw.12306.cn/otn/confirmPassenger/queryOrderWaitTime";
+			Map queryOrderWaitTime_data_map = new HashMap();
+			queryOrderWaitTime_data_map.put("random",new Date().getTime());
+			queryOrderWaitTime_data_map.put("_json_att","");
+			queryOrderWaitTime_data_map.put("REPEAT_SUBMIT_TOKEN",submitToken);
+			queryOrderWaitTime_data_map.put("tourFlag","dc");
+			String rep_queryOrderWaitTime = session.post(url).verify(false).headers(ticketHeaderMap).cookies(passengerscookMap).forms(queryOrderWaitTime_data_map).timeout(30*1000).send().readToText();
+			Map<String,Object> json_map = gson.fromJson(rep_queryOrderWaitTime, HashMap.class);
+			Map data_map = (Map) json_map.get("data");
+			orderId = (String) data_map.get("orderId");
+			if(orderId!=null || !"".equals(orderId)) {
+				break;
+			}
+			System.out.println("rep_queryOrderWaitTime：" +rep_queryOrderWaitTime);
+			waitTimeErrorCount++;
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+		}
+		
+		
+		//resultOrderForDcQueue
+        url = "https://kyfw.12306.cn/otn/confirmPassenger/resultOrderForDcQueue";
+        Map resultOrderForDcQueue_data_map = new HashMap();
+        resultOrderForDcQueue_data_map.put("orderSequence_no", orderId);
+        resultOrderForDcQueue_data_map.put("_json_att", "");
+        resultOrderForDcQueue_data_map.put("REPEAT_SUBMIT_TOKEN", submitToken);
+		String rep_resultOrderForDcQueue = session.post(url).verify(false).headers(ticketHeaderMap).cookies(passengerscookMap).forms(resultOrderForDcQueue_data_map).timeout(30*1000).send().readToText();
+		System.out.println("rep_resultOrderForDcQueue：" +rep_resultOrderForDcQueue);
 	}
 
 
