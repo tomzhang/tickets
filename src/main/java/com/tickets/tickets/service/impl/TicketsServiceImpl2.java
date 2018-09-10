@@ -9,53 +9,50 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.thoughtworks.xstream.XStream;
 import com.tickets.tickets.domain.TrainInfoVO;
+import com.tickets.tickets.service.Headers;
 import com.tickets.tickets.service.TicketsService;
 
+import net.dongliu.requests.Parameter;
 import net.dongliu.requests.Requests;
 import net.dongliu.requests.Session;
+import net.sourceforge.htmlunit.corejs.javascript.ObjToIntMap;
 
 public class TicketsServiceImpl2 {
 	
-	
-	Session session = Requests.session();
+	String url ="";
+	static Session session = Requests.session();
 	XStream xs = new XStream();
 	String[] strs = new String[]{"35,35","105,35","175,35","245,35","35,105","105,105","175,105","245,105"};
 	Gson gson = new Gson();
-	
-	
-	public void login12306() {
-		String url1 ="https://kyfw.12306.cn/otn/passport?redirect=/otn/";
-		String resp1 = session.get(url1).verify(false).headers(getHeaders()).timeout(20*1000).send().readToText();
-		
-		//System.out.println(resp1);
-		System.out.println(xs.toXML(session));
-	}
-	
-	
-	public void toLogin() {
-		
-		
-		//#==================================================登录====================================================================
-		String url ="https://kyfw.12306.cn/otn/login/init";
-		session.get(url).verify(false).headers(getHeaders()).cookies(getCookMap()).send();
+	String captcha_path="D:\\work\\gitee\\ticekets\\database\\captcha.jpg";
 
+	public void toLogin() {
+		//#==================================================登录====================================================================
+		String url_init ="https://kyfw.12306.cn/otn/login/init";
+		session.get(url_init).verify(false).headers(Headers.initHeader()).send();
+
+		String url_uamtk="https://kyfw.12306.cn/passport/web/auth/uamtk";
+		Map request_data_uamtk =new HashMap();
+		request_data_uamtk.put("appid","otn");
+		session.post(url_uamtk).verify(false).body(request_data_uamtk).headers(Headers.uamtkHeader()).send();
 		//验证码处理'
 		boolean booleanCaptcha = getCaptcha();
-		
 		while(!booleanCaptcha) {
 			booleanCaptcha = getCaptcha();
 		}
 		//登录
-		Map<String, Object> map = new HashMap<>();
-		map.put("username", "");
-		map.put("password", "");
-		map.put("appid", "otn");
-		
-		
+		Map<String, Object> login_map = new HashMap<>();
+		login_map.put("username", "");
+		login_map.put("password", "");
+		login_map.put("appid", "otn");
+
 		url = "https://kyfw.12306.cn/passport/web/login";
-		String resp =session.post(url).verify(false).headers(getHeaders()).cookies(getCookMap()).timeout(20*1000).forms(map).send().readToText();
-		
-		
+		String resp =session.post(url).verify(false).headers(Headers.loginHeader()).body(login_map).timeout(30*1000).send().readToText();
+		System.out.println("login输出结果"+resp);
+		Map<String,Object> login_Map = gson.fromJson(resp, HashMap.class);
+		if( (double)(login_Map.get("result_code")) ==1 )
+			return;
+
 		Map<String,Object> uamtkMap = new HashMap();
 		uamtkMap.put("appid", "otn");
 	    url = "https://kyfw.12306.cn/passport/web/auth/uamtk";
@@ -63,8 +60,11 @@ public class TicketsServiceImpl2 {
 		System.out.println("uamtk输出结果 "+resp_uamtk);
 		
 		
-		Map<String,String> resutUamtkMap = gson.fromJson(resp_uamtk, HashMap.class);
-		String newapptk = resutUamtkMap.get("newapptk");
+		Map<String,Object> resutUamtkMap = gson.fromJson(resp_uamtk, HashMap.class);
+		if( (double)(resutUamtkMap.get("result_code")) ==1 )
+			return;
+
+		String newapptk = resutUamtkMap.get("newapptk").toString();
 		
 		
 		Map<String,Object> uamauthclientMap = new HashMap();
@@ -99,8 +99,8 @@ public class TicketsServiceImpl2 {
 		passengerscookMap.put("current_captcha_type", "Z");
 		passengerscookMap.put("_jc_save_fromStation", "南阳,NFF");
 		passengerscookMap.put("_jc_save_toStation", "北京,BJP");
-		passengerscookMap.put("_jc_save_fromDate", "2018-02-21");
-		passengerscookMap.put("_jc_save_toDate", "2018-01-23");
+		passengerscookMap.put("_jc_save_fromDate", "2018-09-21");
+		passengerscookMap.put("_jc_save_toDate", "2018-09-23");
 		passengerscookMap.put("_jc_save_wfdc_flag", "dc");
 		url ="https://kyfw.12306.cn/otn/leftTicket/init";
 		session.get(url).verify(false).headers(getHeaders()).cookies(passengerscookMap).timeout(20*1000).send().readToText();
@@ -109,11 +109,11 @@ public class TicketsServiceImpl2 {
 		
 		
 		Map<String, Object> leftTicketDTOMap = new HashMap<>();
-		leftTicketDTOMap.put("leftTicketDTO.train_date", "2018-02-21");
+		leftTicketDTOMap.put("leftTicketDTO.train_date", "2018-09-21");
 		leftTicketDTOMap.put("leftTicketDTO.from_station", "NFF");
 		leftTicketDTOMap.put("leftTicketDTO.to_station", "BJP");
 		leftTicketDTOMap.put("purpose_codes", "ADULT");
-		url ="https://kyfw.12306.cn/otn/leftTicket/queryZ?leftTicketDTO.train_date=2018-02-21&leftTicketDTO.from_station=NFF&leftTicketDTO.to_station=BJP&purpose_codes=ADULT";
+		url ="https://kyfw.12306.cn/otn/leftTicket/queryZ?leftTicketDTO.train_date=2018-09-21&leftTicketDTO.from_station=NFF&leftTicketDTO.to_station=BJP&purpose_codes=ADULT";
 		String leftTicket_info= session.get(url).verify(false).headers(getHeaders()).cookies(passengerscookMap).timeout(20*1000).forms(leftTicketDTOMap).send().readToText();
 		
 		System.out.println(leftTicket_info);
@@ -128,9 +128,9 @@ public class TicketsServiceImpl2 {
 		boolean flag = false;
 		try {
 			String url ="https://kyfw.12306.cn/passport/captcha/captcha-image?login_site=E&module=login&rand=sjrand&0.7581446374982701";
-			session.get(url).verify(false).headers(getHeaders()).send().writeToFile("D:/img/c1.jpg");
+			session.get(url).verify(false).send().writeToFile(captcha_path);
 			Runtime run = Runtime.getRuntime();
-			run.exec("cmd.exe /c D:/img/c1.jpg");
+			run.exec("cmd.exe /c "+captcha_path);
 			if(checkCaptcha()) {
 				flag = true;
 			}
@@ -170,9 +170,8 @@ public class TicketsServiceImpl2 {
 			map.put("answer", read);
 			map.put("login_site", "E");
 			map.put("rand", "sjrand");
-			String url ="https://kyfw.12306.cn/passport/captcha/captcha-check";
-			//Response<String> resp =session.get(url).verify(false).headers(getHeaders()).params(map).send().toTextResponse();
-			String resp =session.post(url).verify(false).headers(getHeaders()).forms(map).send().readToText();		
+			String url_captcha_check ="https://kyfw.12306.cn/passport/captcha/captcha-check";
+			String resp =session.post(url_captcha_check).verify(false).headers(Headers.captcha_checkHeader()).forms(map).send().readToText();
 			System.out.println("输出结果："+resp);
 			
 			
@@ -182,7 +181,6 @@ public class TicketsServiceImpl2 {
 				flag = true;
 			}
 		} catch (JsonSyntaxException e) {
-			// TODO Auto-generated catch block
 			//e.printStackTrace();
 			System.out.println(e);
 		}finally {
@@ -195,16 +193,17 @@ public class TicketsServiceImpl2 {
 	
 	public Map getHeaders() {
 		Map<String, Object> headers = new HashMap<>();
-		headers.put("User-Agent", "	Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Win64; x64; Trident/5.0)");
-		headers.put("Host", "kyfw.12306.cn");
-		headers.put("Referer", "https://kyfw.12306.cn/otn/passport?redirect=/otn/");
+		headers.put("User-Agent","Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Mobile Safari/537.36");
+		headers.put("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
+		headers.put("X-Requested-With", "xmlHttpRequest");
+		headers.put("Referer", "https://kyfw.12306.cn/otn/login/init");
 		return headers;
 	}
 	
 	public Map getCookMap(){
 		Map<String, Object> cookMap = new HashMap();
-		cookMap.put("RAIL_EXPIRATION", "1516917960445");
-		cookMap.put("RAIL_DEVICEID", "TmT78ekQQpUwFhuGfYzfDiymQ7sGBdpN5Dc-Xt_NyP4zUrLOaCJ1JKsnlbg2CYAa7KcSWz_lyTC_vqUi--9RT3rU0-OWJZqDkXbynCROMvJH7QsEsTNHPsUdI0HsGKUC4RgPVe0rpHo_gFtazAgs5faOE1P-zRgK");
+		cookMap.put("RAIL_EXPIRATION", "1536772772843");
+		cookMap.put("RAIL_DEVICEID", "jo1LogO-O2jIGRAO5TgN3FaxGxZRDuC5jSnIdFox2JFxxnO-GUDtT2GxBIAVUmje91ej1BkmE0W7qBrtiZWsQe-Xo0n8umQG1PJKMUa8JsPvrl08X8-O6pD8zwXbxZTrEKyQ8SEqh6lzC_Xs7_w8gFkqImy9rmVx");
 		return cookMap;
 	}
 	
@@ -227,9 +226,15 @@ public class TicketsServiceImpl2 {
 	
 	public static void main(String[]args) {
 		TicketsServiceImpl2 i = new TicketsServiceImpl2();
+		//i.login12306();
 		i.toLogin();
 		//i.checkCaptcha();
 		//i.getCaptcha();
+/*		String url ="http://localhost:8080/index";
+		Map map = new HashMap();
+		map.put("info","test1");
+		String result = session.post(url).body(map).send().readToText();
+		System.out.println(result);*/
 	}
 
 

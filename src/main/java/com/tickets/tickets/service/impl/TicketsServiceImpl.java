@@ -36,7 +36,7 @@ import net.dongliu.requests.Requests;
 import net.dongliu.requests.Session;
 
 @Service
-public class TicketsServiceImpl implements TicketsService {
+public class TicketsServiceImpl{
 	
 	static	Session session = Requests.session();
 	static XStream xs = new XStream();
@@ -52,7 +52,7 @@ public class TicketsServiceImpl implements TicketsService {
 	
 	
 	
-	@Override
+
 	public void login12306() {
 		toLogin();
 	}
@@ -140,9 +140,11 @@ public class TicketsServiceImpl implements TicketsService {
 		boolean flag = false;
 		try {
 			String url ="https://kyfw.12306.cn/passport/captcha/captcha-image?login_site=E&module=login&rand=sjrand&0.7581446374982701";
-			session.get(url).verify(false).headers(getHeaders()).send().writeToFile("D:/img/c1.jpg");
+			String imgPath ="D:\\work\\gitee\\ticekets\\database\\img\\captcha.jpg";
+			session.get(url).verify(false).headers(getHeaders()).send().writeToFile(imgPath);
+			System.out.println(xs.toXML(session));
 			Runtime run = Runtime.getRuntime();
-			run.exec("cmd.exe /c D:/img/c1.jpg");
+			run.exec("cmd.exe /c "+imgPath);
 			if(checkCaptcha()) {
 				flag = true;
 			}
@@ -452,7 +454,7 @@ public class TicketsServiceImpl implements TicketsService {
 	}
 
 
-	@Override
+	
 	public TrainInfoVO query() {
 		System.out.println("车票查询，session hashcode:"+session.hashCode());
 		String url ="https://kyfw.12306.cn/otn/leftTicket/queryZ?leftTicketDTO.train_date=2018-02-20&leftTicketDTO.from_station=BJP&leftTicketDTO.to_station=TJP&purpose_codes=ADULT";
@@ -464,7 +466,7 @@ public class TicketsServiceImpl implements TicketsService {
 	}
 
 
-	@Override
+	
 	public void buyTicket() {
 		
 		String seatType = "O";//二等座		
@@ -670,8 +672,7 @@ public class TicketsServiceImpl implements TicketsService {
 		}
 		return passengers;
 	}
-	
-	
-	
+
+
 
 }
