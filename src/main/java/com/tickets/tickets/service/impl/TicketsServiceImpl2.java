@@ -46,21 +46,22 @@ public class TicketsServiceImpl2 {
 		login_map.put("password", "");
 		login_map.put("appid", "otn");
 
-		url = "https://kyfw.12306.cn/passport/web/login";
-		String resp =session.post(url).verify(false).headers(Headers.loginHeader()).body(login_map).timeout(30*1000).send().readToText();
-		System.out.println("login输出结果"+resp);
-		Map<String,Object> login_Map = gson.fromJson(resp, HashMap.class);
-		if( (double)(login_Map.get("result_code")) ==1 )
+		String url_login = "https://kyfw.12306.cn/passport/web/login";
+		String response_login =session.post(url_login).verify(false).headers(Headers.loginHeader()).body(login_map).timeout(30*1000).send().readToText();
+		System.out.println("login输出结果"+response_login);
+		Map<String,Object> login_Map = gson.fromJson(response_login, HashMap.class);
+		if( (double)(login_Map.get("result_code")) != 0 )
 			return;
 
-		Map<String,Object> uamtkMap = new HashMap();
-		uamtkMap.put("appid", "otn");
-	    url = "https://kyfw.12306.cn/passport/web/auth/uamtk";
-		String resp_uamtk =session.post(url).verify(false).headers(getHeaders()).cookies(getCookMap()).timeout(20*1000).forms(uamtkMap).send().readToText();
-		System.out.println("uamtk输出结果 "+resp_uamtk);
+		String url_userLoginRedirect="https://kyfw.12306.cn/otn/passport?redirect=/otn/login/userLogin";
+		session.get(url_userLoginRedirect).verify(false).timeout(30*1000).send().readToText();
+
+
+		String response_uamtk =session.post(url_uamtk).verify(false).body(request_data_uamtk).headers(Headers.uamtkHeader()).send().readToText();
+		System.out.println("uamtk输出结果 "+response_uamtk);
 		
 		
-		Map<String,Object> resutUamtkMap = gson.fromJson(resp_uamtk, HashMap.class);
+		Map<String,Object> resutUamtkMap = gson.fromJson(response_uamtk, HashMap.class);
 		if( (double)(resutUamtkMap.get("result_code")) ==1 )
 			return;
 
@@ -68,21 +69,19 @@ public class TicketsServiceImpl2 {
 		
 		
 		Map<String,Object> uamauthclientMap = new HashMap();
-		uamtkMap.put("tk", newapptk);
+		uamauthclientMap.put("tk", newapptk);
 		url = "https://kyfw.12306.cn/otn/uamauthclient";
 		String resp_uamauthclient = session.post(url).verify(false).headers(getHeaders()).cookies(getCookMap()).timeout(20*1000).forms(uamauthclientMap).send().readToText();
-		
+		//uamauthclient输出结果 {"apptk":"IxNXmsOXNoxibILuVt5x70CaTLs_Ywe-M7S0Lg92l2l0","result_code":0,"result_message":"验证通过","username":"刘中学"}
 		
 	//	url = "https://kyfw.12306.cn/otn/login/userLogin";
 	//	session.get(url).verify(false).headers(getHeaders()).cookies(getCookMap()).forms(uamauthclientMap).timeout(40*1000).send().readToText();
 		
 		System.out.println("uamauthclient输出结果 "+resp_uamauthclient);
 		
-		 url = "https://kyfw.12306.cn/otn/index/initMy12306";
-		 String loginSucess = session.get(url).verify(false).headers(getHeaders()).cookies(getCookMap()).forms(uamauthclientMap).timeout(20*1000).send().readToText();
-		 
-		
-		System.out.println(loginSucess);
+		// url = "https://kyfw.12306.cn/otn/index/initMy12306";
+		// String loginSucess = session.get(url).verify(false).headers(getHeaders()).cookies(getCookMap()).forms(uamauthclientMap).timeout(20*1000).send().readToText();
+
 		 
 		//#==================================================获取联系人====================================================================
 		Map passengerscookMap = getCookMap();
