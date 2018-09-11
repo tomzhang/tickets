@@ -2,6 +2,7 @@ package com.tickets.tickets.service.impl;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -12,9 +13,8 @@ import com.tickets.tickets.domain.TrainInfoVO;
 import com.tickets.tickets.service.Headers;
 import com.tickets.tickets.service.TicketsService;
 
-import net.dongliu.requests.Parameter;
-import net.dongliu.requests.Requests;
-import net.dongliu.requests.Session;
+import com.tickets.tickets.utils.FileUtils;
+import net.dongliu.requests.*;
 import net.sourceforge.htmlunit.corejs.javascript.ObjToIntMap;
 
 public class TicketsServiceImpl2 {
@@ -24,12 +24,12 @@ public class TicketsServiceImpl2 {
 	XStream xs = new XStream();
 	String[] strs = new String[]{"35,35","105,35","175,35","245,35","35,105","105,105","175,105","245,105"};
 	Gson gson = new Gson();
-	String captcha_path="D:\\work\\gitee\\ticekets\\database\\captcha.jpg";
+	String captcha_path="D:\\work2\\img\\captcha.jpg";
 
 	public void toLogin() {
 		//#==================================================登录====================================================================
 		String url_init ="https://kyfw.12306.cn/otn/login/init";
-		session.get(url_init).verify(false).headers(Headers.initHeader()).send();
+		session.get(url_init).verify(false).headers(Headers.initHeader()).timeout(20*1000).send();
 
 		String url_uamtk="https://kyfw.12306.cn/passport/web/auth/uamtk";
 		Map request_data_uamtk =new HashMap();
@@ -78,21 +78,23 @@ public class TicketsServiceImpl2 {
 	//	session.get(url).verify(false).headers(getHeaders()).cookies(getCookMap()).forms(uamauthclientMap).timeout(40*1000).send().readToText();
 		
 		System.out.println("uamauthclient输出结果 "+resp_uamauthclient);
-		
+		Map<String,Object> response_uamauthclient_data = gson.fromJson(resp_uamauthclient,HashMap.class);
+		if( (double)(response_uamauthclient_data.get("result_code")) != 0 )
+			return;
+		String username = response_uamauthclient_data.get("username").toString();
+		System.out.println("欢迎：【"+username+"】登录");
+
+		List<Cookie> cookies = session.currentCookies();
+		FileUtils.writeXmlToFile(xs.toXML(cookies));
+
+
 		// url = "https://kyfw.12306.cn/otn/index/initMy12306";
 		// String loginSucess = session.get(url).verify(false).headers(getHeaders()).cookies(getCookMap()).forms(uamauthclientMap).timeout(20*1000).send().readToText();
 
 		 
 		//#==================================================获取联系人====================================================================
-		Map passengerscookMap = getCookMap();
-		passengerscookMap.put("tk", newapptk);
-		 
-		url ="https://kyfw.12306.cn/otn/passengers/init"; 
-		String res_passengers= session.post(url).verify(false).headers(getHeaders()).cookies(passengerscookMap).timeout(40*1000).send().readToText();
-		System.out.println(res_passengers);
-		String passengers_json = res_passengers.substring(res_passengers.indexOf("[{'passenger_type_name'"), res_passengers.indexOf("'}];")+3);
-		System.out.println("常用联系人信息为："+passengers_json);
-		
+
+/*
 		//#==================================================车票预定====================================================================
 		//南阳-北京
 		passengerscookMap.put("current_captcha_type", "Z");
@@ -105,8 +107,8 @@ public class TicketsServiceImpl2 {
 		session.get(url).verify(false).headers(getHeaders()).cookies(passengerscookMap).timeout(20*1000).send().readToText();
 		url="https://kyfw.12306.cn/otn/dynamicJs/qgdbwtc";
 		session.get(url).verify(false).headers(getHeaders()).cookies(passengerscookMap).timeout(20*1000).send().readToText();
-		
-		
+
+
 		Map<String, Object> leftTicketDTOMap = new HashMap<>();
 		leftTicketDTOMap.put("leftTicketDTO.train_date", "2018-09-21");
 		leftTicketDTOMap.put("leftTicketDTO.from_station", "NFF");
@@ -114,8 +116,8 @@ public class TicketsServiceImpl2 {
 		leftTicketDTOMap.put("purpose_codes", "ADULT");
 		url ="https://kyfw.12306.cn/otn/leftTicket/queryZ?leftTicketDTO.train_date=2018-09-21&leftTicketDTO.from_station=NFF&leftTicketDTO.to_station=BJP&purpose_codes=ADULT";
 		String leftTicket_info= session.get(url).verify(false).headers(getHeaders()).cookies(passengerscookMap).timeout(20*1000).forms(leftTicketDTOMap).send().readToText();
-		
-		System.out.println(leftTicket_info);
+
+		System.out.println(leftTicket_info);*/
 	}
 	
 	
@@ -221,12 +223,35 @@ public class TicketsServiceImpl2 {
 			return result;
 		}
 	}
+
+	public  void getPersons(){
+		String cookies_xml = FileUtils.readXmlToFile();
+		List<Cookie> cookies = (List<Cookie>) xs.fromXML(cookies_xml);
+		String url_getPassengerDTOs ="https://kyfw.12306.cn/otn/confirmPassenger/getPassengerDTOs";
+		Map request_data_getPassengerDTOs = new HashMap();
+		request_data_getPassengerDTOs.put("_json_att","");
+		//request_data_getPassengerDTOs.put("REPEAT_SUBMIT_TOKEN","");
+		String res_passengers= session.get(url_getPassengerDTOs).verify(false).headers(Headers.passengersInitHeader()).cookies(cookies).body(request_data_getPassengerDTOs).timeout(40*1000).send().readToText();
+		System.out.println(res_passengers);
+
+
+/*
+		Map passengerscookMap = getCookMap();
+		passengerscookMap.put("_json_att", "");
+
+		url ="https://kyfw.12306.cn/otn/passengers/init";
+		String res_passengers= session.post(url).verify(false).headers(Headers.passengersInitHeader()).cookies(cookies).timeout(180*1000).send().readToText();
+		System.out.println(res_passengers);
+	//	String passengers_json = res_passengers.substring(res_passengers.indexOf("[{'passenger_type_name'"), res_passengers.indexOf("'}];")+3);
+	//	System.out.println("常用联系人信息为："+passengers_json);*/
+	}
 	
 	
 	public static void main(String[]args) {
 		TicketsServiceImpl2 i = new TicketsServiceImpl2();
 		//i.login12306();
-		i.toLogin();
+		//i.toLogin();
+		i.getPersons();
 		//i.checkCaptcha();
 		//i.getCaptcha();
 /*		String url ="http://localhost:8080/index";
