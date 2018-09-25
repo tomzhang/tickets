@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tickets.tickets.service.TicketsService;
@@ -48,15 +49,16 @@ public class TicketController {
 	}
 
 	@RequestMapping("/doLogin")
+	@ResponseBody
 	public Map doLogin(String username,String password) throws Exception {
-		Map resulstMap = new HashMap();
 		Map map  = loginService.doLogin(username,password);
-		return resulstMap;
+		return map;
 	}
 
 
-	@RequestMapping("/chckCaptcha")
-	public Map chckCaptcha(String captcha) throws Exception {
+	@RequestMapping("/checkCaptcha")
+	@ResponseBody
+	public Map checkCaptcha(String captcha) throws Exception {
 		log.info(captcha);
 		Map resulstMap = new HashMap();
 		boolean flag = loginService.checkCaptcha(captcha);
@@ -68,22 +70,6 @@ public class TicketController {
 		return resulstMap;
 	}
 
-	@RequestMapping("/login12306")
-	public String login12306() {
-	//	ticketsService.login12306();
-		 return "index";  
-	}
-	
-	@RequestMapping("/query")
-	public String query() {
-	//	ticketsService.query();
-		 return "index";  
-	}
-	
-	@RequestMapping("/buy")
-	public String buy() {
-	//	ticketsService.buyTicket();
-		 return "index";  
-	}
+
 	
 }

@@ -15,12 +15,11 @@ import com.tickets.tickets.domain.PassengerVO;
 import com.tickets.tickets.domain.TrainInfoVO;
 import com.tickets.tickets.domain.TrainLineInfoVO;
 import com.tickets.tickets.domain.TrainStationInfoVO;
-import com.tickets.tickets.service.Headers;
+import com.tickets.tickets.content.Headers;
 
 import com.tickets.tickets.utils.FileUtils;
 import com.tickets.tickets.utils.StationDataUtils;
 import com.tickets.tickets.utils.TextTable;
-import javafx.scene.text.Text;
 import net.dongliu.requests.*;
 
 public class TicketsServiceImpl2 {

@@ -1,16 +1,15 @@
 package com.tickets.tickets.service.impl;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import com.tickets.tickets.service.Headers;
+import com.tickets.tickets.content.CookiesContent;
+import com.tickets.tickets.content.Headers;
+import com.tickets.tickets.content.WebContent;
 import com.tickets.tickets.service.LoginService;
 import com.tickets.tickets.utils.SessionUtils;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 @Service
 public class LoginServiceImpl implements LoginService {
@@ -33,6 +32,8 @@ public class LoginServiceImpl implements LoginService {
         Map<String,Object> map_callbackFunction =  gson.fromJson(callbackFunction, HashMap.class);
         String exp = map_callbackFunction.get("exp").toString();
         String dfp = map_callbackFunction.get("dfp").toString();
+        CookiesContent.RAIL_EXPIRATION =exp;
+        CookiesContent.RAIL_DEVICEID = dfp;
 
 
         String url_uamtk="https://kyfw.12306.cn/passport/web/auth/uamtk";
@@ -75,7 +76,57 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public Map doLogin(String username, String password) {
-        return null;
+        Map resultMap = new HashMap();
+
+        //登录
+        Map<String, Object> login_map = new HashMap<>();
+        login_map.put("username", username);
+        login_map.put("password", password);
+        login_map.put("appid", "otn");
+
+        String url_login = "https://kyfw.12306.cn/passport/web/login";
+        String response_login =SessionUtils.session().post(url_login).verify(false).headers(Headers.loginHeader()).body(login_map).timeout(30*1000).send().readToText();
+        System.out.println("login输出结果"+response_login);
+        Map<String,Object> login_Map = gson.fromJson(response_login, HashMap.class);
+        if( (double)(login_Map.get("result_code")) != 0 ){
+            resultMap.put("code","0");
+            return  resultMap;
+        }
+
+        String url_userLoginRedirect="https://kyfw.12306.cn/otn/passport?redirect=/otn/login/userLogin";
+        SessionUtils.session().get(url_userLoginRedirect).verify(false).timeout(30*1000).send().readToText();
+
+        String url_uamtk="https://kyfw.12306.cn/passport/web/auth/uamtk";
+        Map request_data_uamtk =new HashMap();
+        request_data_uamtk.put("appid","otn");
+        String response_uamtk =SessionUtils.session().post(url_uamtk).verify(false).body(request_data_uamtk).headers(Headers.uamtkHeader()).send().readToText();
+        System.out.println("uamtk输出结果 "+response_uamtk);
+
+
+        Map<String,Object> resutUamtkMap = gson.fromJson(response_uamtk, HashMap.class);
+        if( (double)(resutUamtkMap.get("result_code")) ==1 ){
+            resultMap.put("code","0");
+            return  resultMap;
+        }
+
+        String newapptk = resutUamtkMap.get("newapptk").toString();
+        Map<String,Object> uamauthclientMap = new HashMap();
+        uamauthclientMap.put("tk", newapptk);
+        String url_uamauthclient = "https://kyfw.12306.cn/otn/uamauthclient";
+        String resp_uamauthclient = SessionUtils.session().post(url_uamauthclient).verify(false).headers(Headers.uamauthclientHeader()).cookies(CookiesContent.getCookMap()).timeout(20*1000).forms(uamauthclientMap).send().readToText();
+
+        System.out.println("uamauthclient输出结果 "+resp_uamauthclient);
+        Map<String,Object> response_uamauthclient_data = gson.fromJson(resp_uamauthclient,HashMap.class);
+        if( (double)(response_uamauthclient_data.get("result_code")) != 0 ){
+            resultMap.put("code","0");
+            return  resultMap;
+        }
+        String usernames = response_uamauthclient_data.get("username").toString();
+        WebContent.usernames = usernames;
+        System.out.println("欢迎：【"+usernames+"】登录");
+        resultMap.put("code","1");
+        resultMap.put("usernames",usernames);
+        return  resultMap;
     }
 
     public String getPostion(String inputs){

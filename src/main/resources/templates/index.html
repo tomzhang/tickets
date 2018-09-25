@@ -26,9 +26,9 @@
 	<form class="form-signin">
 		<h2 class="form-signin-heading">登录12306</h2>
 		<label for="username" class="sr-only">12306账号：</label>
-		<input type="text" id="username" class="form-control" placeholder="12306账号" />
+		<input type="text" id="username" class="form-control" placeholder="12306账号" value="@qq.com" />
 		<label for="password" class="sr-only">12306密码</label>
-		<input type="password" id="password" class="form-control" placeholder="12306密码" />
+		<input type="password" id="password" class="form-control" placeholder="12306密码"  value=""/>
 
 		<div id="captcha" style="height: 200px;">
 			<table id="captcha_table" style="position:absolute; z-index:2;width: 300px;height: 180px;" >
@@ -69,33 +69,39 @@
     var context = [[@{/}]];
 
 	function submitForm() {
-		var username = $("#username").val();
-		var password = $("#password").val();
-		var url_login=context+"";
-        $.get(url_check_captcha,function (data) {
-            if(data.code==1){
-                //登录
-            }else{
-                //重新获取验证码
-            }
-        })
+        check_captcha();
     }
 
     function check_captcha(){
         var captcha=$("input:checkbox:checked").map(function(){
             return $(this).val();
         }).get().join(",");
-
-        var url_check_captcha = context+"ticket/chckCaptcha?captcha="+captcha;
+        var url_check_captcha = context+"ticket/checkCaptcha?captcha="+captcha;
         $.get(url_check_captcha,function (data) {
 			if(data.code==1){
 				//登录
+                doLogin();
 			}else{
 				//重新获取验证码
+				$("#captcha_img").attr("src",context+"ticket/getCaptcha");
         	}
         })
     }
-	
+
+    function doLogin() {
+        var url = context+"ticket/doLogin";
+        var username = $("#username").val();
+        var password = $("#password").val();
+        $.get(url,{"username":username,"password":password},function (data) {
+            if(data.code==1){
+                //登录
+				alert("登录成功!");
+            }else{
+                location.reload();
+            }
+        })
+    }
+
 </script>
 
 

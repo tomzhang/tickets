@@ -1,4 +1,4 @@
-package com.tickets.tickets.service;
+package com.tickets.tickets.content;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +32,15 @@ public class Headers {
         map.put("X-Requested-With","xmlHttpRequest");
         map.put("Referer","https://kyfw.12306.cn/otn/login/init");
         return map;
+    }
+
+    public static Map uamauthclientHeader(){
+        Map<String, Object> headers = new HashMap<>();
+        headers.put("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko");
+        headers.put("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
+        headers.put("X-Requested-With", "xmlHttpRequest");
+        headers.put("Referer", "https://kyfw.12306.cn/otn/login/init");
+        return headers;
     }
 
 
