@@ -36,7 +36,7 @@ import net.dongliu.requests.Requests;
 import net.dongliu.requests.Session;
 
 @Service
-public class TicketsServiceImpl{
+public class TicketsServiceImpl {
 	
 	static	Session session = Requests.session();
 	static XStream xs = new XStream();
