@@ -47,6 +47,14 @@ public class TicketController {
 		stream.close();
 	}
 
+	@RequestMapping("/doLogin")
+	public Map doLogin(String username,String password) throws Exception {
+		Map resulstMap = new HashMap();
+		Map map  = loginService.doLogin(username,password);
+		return resulstMap;
+	}
+
+
 	@RequestMapping("/chckCaptcha")
 	public Map chckCaptcha(String captcha) throws Exception {
 		log.info(captcha);

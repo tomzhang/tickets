@@ -72,6 +72,12 @@ public class LoginServiceImpl implements LoginService {
 
 
 }
+
+    @Override
+    public Map doLogin(String username, String password) {
+        return null;
+    }
+
     public String getPostion(String inputs){
         String result ="";
         if(inputs.equals("")|| inputs==null){

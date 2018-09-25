@@ -1,5 +1,7 @@
 package com.tickets.tickets.service;
 
+import java.util.Map;
+
 public interface LoginService {
     /**
      * 去登录
@@ -17,4 +19,12 @@ public interface LoginService {
      * @return
      */
     boolean checkCaptcha(String captcha);
+
+    /**
+     * 登录
+     * @param username
+     * @param password
+     * @return
+     */
+    Map doLogin(String username,String password);
 }
