@@ -18,7 +18,33 @@ function queryTrains() {
          train_date:train_date
         },
         success: function (data) {
-            alert(data);
+            var trainLineInfos =data.trainLineInfos;
+            $("#ticket_table tbody").remove();
+            var html="<tbody>";
+            $(trainLineInfos).each(function (index,obj) {
+               // alert(obj.from_station_y_name);
+                html +="<tr>";
+                html +="<td> "+obj.station_train_code +" </td>";
+                html +="<td> "+obj.from_station_y_name +" </td>";
+                html +="<td> "+obj.to_station_y_name +" </td>";
+                html +="<td> "+obj.duration +" </td>";
+                html +="<td> "+obj.swz_num +" </td>";
+                html +="<td> "+obj.zy_num +" </td>";
+                html +="<td> "+obj.ze_num +" </td>";
+                html +="<td> "+obj.gjrw_num +" </td>";
+                html +="<td> "+obj.rw_num +" </td>";
+                html +="<td> "+obj.dw_num +" </td>";
+                html +="<td> "+obj.yw_num +" </td>";
+                html +="<td> "+obj.rz_num +" </td>";
+                html +="<td> "+obj.yz_num +" </td>";
+                html +="<td> "+obj.wz_num +" </td>";
+                html +="<td> "+obj.qt_num +" </td>";
+                html +="<td> "+obj.start_time +" </td>";
+
+                html +="</tr>";
+            })
+            html +="</tbody>";
+            $("#ticket_table").append(html);
         },
         error: function (message) {
         }
