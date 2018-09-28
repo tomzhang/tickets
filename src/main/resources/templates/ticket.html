@@ -23,7 +23,7 @@
 	<div class="container">
 
 		<div class="row">
-			<div class="col-md-4">出发地：
+			<div class="col-md-3">出发地：
 				<div class="input-group">
 					<input type="text" class="form-control" id="from_station" />
 					<div class="input-group-btn">
@@ -35,7 +35,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-4">目的地：
+			<div class="col-md-3">目的地：
 				<div class="input-group">
 					<input type="text" class="form-control" id="to_station" />
 					<div class="input-group-btn">
@@ -47,64 +47,28 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-4">日期：<input type="train_date" class="form-control" /> </div>
+
+			<div class="col-md-3">
+				日期：<input type="date" id="train_date" class="form-control" />
+			</div>
+
+			<div class="col-md-3">
+				<input type="button" class="btn btn-primary" value="查询" onclick="queryTrains()"/>
+			</div>
 		</div>
-
-
-
-
 	</div>
 
 	<script th:src="@{/bootstrap/ie10-viewport-bug-workaround.js}"></script>
 	<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script th:src="@{/bootstrap/bootstrap-suggest.js}"></script>
-	<script th:src="@{/12306/station_name.js}"></script>
 	<script th:src="@{/12306/stations_data.js}"></script>
+	<script th:src="@{/ticket/bsSuggest.js}"></script>
+	<script th:src="@{/ticket/querytrain.js}"></script>
 
 
 	<script th:inline="javascript">
         var context = [[@{/}]];
-
-		$(function () {
-            $("#from_station").bsSuggest({
-                url:context+"12306/station_data.json",
-                effectiveFieldsAlias:{serial:"序号",station_name: "车站名",station_code:"车站代码",station_py:"车站拼音检索"},
-                ignorecase: true,
-                showHeader: true,
-                showBtn: false,     //不显示下拉按钮
-                delayUntilKeyup: true, //获取数据的方式为 firstByUrl 时，延迟到有输入/获取到焦点时才请求数据
-                idField: "station_code",
-                keyField: "station_name",
-                clearable: false
-            }).on('onDataRequestSuccess', function (e, result) {
-                console.log('onDataRequestSuccess: ', result);
-            }).on('onSetSelectValue', function (e, keyword, data) {
-                console.log('onSetSelectValue: ', keyword, data);
-            }).on('onUnsetSelectValue', function () {
-                console.log("onUnsetSelectValue");
-            });
-        });
-
-
-            $("#to_station").bsSuggest({
-                url:context+"12306/station_data.json",
-                effectiveFieldsAlias:{serial:"序号",station_name: "车站名",station_code:"车站代码",station_py:"车站拼音检索"},
-                ignorecase: true,
-                showHeader: true,
-                showBtn: false,     //不显示下拉按钮
-                delayUntilKeyup: true, //获取数据的方式为 firstByUrl 时，延迟到有输入/获取到焦点时才请求数据
-                idField: "station_code",
-                keyField: "station_name",
-                clearable: false
-            }).on('onDataRequestSuccess', function (e, result) {
-                console.log('onDataRequestSuccess: ', result);
-            }).on('onSetSelectValue', function (e, keyword, data) {
-                console.log('onSetSelectValue: ', keyword, data);
-            }).on('onUnsetSelectValue', function () {
-                console.log("onUnsetSelectValue");
-            });
-
 	</script>
 
 </body>

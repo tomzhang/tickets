@@ -1,6 +1,8 @@
 package com.tickets.tickets.controller;
 
+import com.tickets.tickets.domain.TrainInfoVO;
 import com.tickets.tickets.service.LoginService;
+import com.tickets.tickets.service.TicketService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,6 +27,8 @@ public class TicketController {
 
 	@Autowired
 	private LoginService loginService;
+	@Autowired
+	private TicketService ticketService;
 	
 	@RequestMapping("/index")
 	public String index() {
@@ -76,5 +80,12 @@ public class TicketController {
 		return "ticket";
 	}
 
+	@RequestMapping("/queryTrains")
+	@ResponseBody
+	public TrainInfoVO queryTrains(String fromStation,String fromStation_code,
+								   String toStation,String toStation_code,
+								   String train_date){
+		return ticketService.query( fromStation, fromStation_code,toStation, toStation_code, train_date);
+	}
 
 }
