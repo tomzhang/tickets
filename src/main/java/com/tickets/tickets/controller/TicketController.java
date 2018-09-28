@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.tickets.tickets.service.TicketsService;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
@@ -21,9 +22,7 @@ import java.util.Map;
 @RequestMapping("/ticket")
 @Slf4j
 public class TicketController {
-	
-//	@Autowired
-//	private TicketsService ticketsService;
+
 	@Autowired
 	private LoginService loginService;
 	
@@ -48,14 +47,6 @@ public class TicketController {
 		stream.close();
 	}
 
-	@RequestMapping("/doLogin")
-	@ResponseBody
-	public Map doLogin(String username,String password) throws Exception {
-		Map map  = loginService.doLogin(username,password);
-		return map;
-	}
-
-
 	@RequestMapping("/checkCaptcha")
 	@ResponseBody
 	public Map checkCaptcha(String captcha) throws Exception {
@@ -70,6 +61,20 @@ public class TicketController {
 		return resulstMap;
 	}
 
+	@RequestMapping("/doLogin")
+	@ResponseBody
+	public Map doLogin(String username, String password, HttpSession session) throws Exception {
+		Map map  = loginService.doLogin(username,password);
+		session.setAttribute("username",username);
+		session.setAttribute("password",password);
+		session.setAttribute("usernames",map.get("usernames"));
+		return map;
+	}
 
-	
+	@RequestMapping("/toTicket")
+	public String toTicket(){
+		return "ticket";
+	}
+
+
 }

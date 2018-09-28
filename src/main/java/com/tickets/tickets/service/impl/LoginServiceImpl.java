@@ -62,7 +62,7 @@ public class LoginServiceImpl implements LoginService {
         map.put("login_site", "E");
         map.put("rand", "sjrand");
         String url_captcha_check ="https://kyfw.12306.cn/passport/captcha/captcha-check";
-        String resp =SessionUtils.session().post(url_captcha_check).verify(false).headers(Headers.captcha_checkHeader()).forms(map).send().readToText();
+        String resp =SessionUtils.session().post(url_captcha_check).verify(false).headers(Headers.captcha_checkHeader()).body(map).timeout(30*1000).send().readToText();
         System.out.println("输出结果："+resp);
         Map<String,String> resMap = gson.fromJson(resp, HashMap.class);
         String result_code = resMap.get("result_code");
