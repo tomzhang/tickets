@@ -5,7 +5,7 @@ function queryTrains() {
     var toStation= $("#to_station").attr("alt");
     var toStation_code=$("#to_station").attr("data-id");
     var train_date = $("#train_date").val();
-/*
+
     $.ajax({
         type: "post",
         url: context+"ticket/queryTrains",
@@ -22,7 +22,7 @@ function queryTrains() {
         },
         error: function (message) {
         }
-    });*/
+    });
 
 
 }

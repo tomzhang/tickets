@@ -23,8 +23,8 @@ public class TicketSerivceImpl implements TicketService {
                              String train_date) {
         String queryA_url="https://kyfw.12306.cn/otn/leftTicket/queryA?leftTicketDTO.train_date={0}&leftTicketDTO.from_station={1}&leftTicketDTO.to_station={2}&purpose_codes=ADULT";
         queryA_url = queryA_url.replace("{0}",train_date);
-        queryA_url = queryA_url.replace("{1}",fromStation);
-        queryA_url = queryA_url.replace("{2}",toStation);
+        queryA_url = queryA_url.replace("{1}",fromStation_code);
+        queryA_url = queryA_url.replace("{2}",toStation_code);
 
         Map<String, Object> cookie_queryA = new HashMap<>();
         try {
@@ -39,7 +39,7 @@ public class TicketSerivceImpl implements TicketService {
         String response_queryA = SessionUtils.session().get(queryA_url).verify(false).headers(Headers.queryAHeader()).cookies(cookie_queryA).timeout(30*1000).send().readToText();
         System.out.println(response_queryA);
         TrainInfoVO trainInfoVO = getTrainInfoVO(response_queryA);
-        return null;
+        return trainInfoVO;
     }
 
     /**

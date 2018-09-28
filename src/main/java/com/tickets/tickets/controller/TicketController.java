@@ -85,6 +85,7 @@ public class TicketController {
 	public TrainInfoVO queryTrains(String fromStation,String fromStation_code,
 								   String toStation,String toStation_code,
 								   String train_date){
+		log.info( fromStation+" "+fromStation_code+" "+toStation+" "+toStation_code+" "+train_date);
 		return ticketService.query( fromStation, fromStation_code,toStation, toStation_code, train_date);
 	}
 
