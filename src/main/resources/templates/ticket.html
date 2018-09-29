@@ -57,8 +57,8 @@
 			</div>
 		</div>
 
-		<div class="row">
-			<table id="ticket_table" class="table table-bordered">
+		<div class="row" style="height: 500px;overflow-y:auto;overflow-x:hidden;">
+			<table id="ticket_table" class="table table-bordered table-condensed">
 				<thead>
 				<tr>
 					<th>车次</th>
@@ -82,7 +82,75 @@
 			</table>
 
 		</div>
+
+
+
+		<div class="row">
+
+			<div class="col-md-3">
+				<table id="passenger" class="table table-bordered table-condensed">
+					<caption>选择乘客</caption>
+					<thead>
+					<tr>
+						<th>姓名</th>
+					</tr>
+					</thead>
+				</table>
+			</div>
+			<div class="col-md-3">
+				<table class="table table-bordered table-condensed">
+					<caption>选择席位</caption>
+					<thead>
+					<tr>
+						<th>席位</th>
+					</tr>
+					</thead>
+					<tbody>
+						<tr>    <td> <input type="checkbox" name="xw" /> &nbsp;&nbsp; 硬卧 </td> </tr>
+						<tr>    <td> <input type="checkbox" name="xw" /> &nbsp;&nbsp; 硬座 </td> </tr>
+						<tr>	<td> <input type="checkbox" name="xw" /> &nbsp;&nbsp; 二等座 </td> </tr>
+						<tr>	<td> <input type="checkbox" name="xw" /> &nbsp;&nbsp; 一等座 </td> </tr>
+						<tr>	<td> <input type="checkbox" name="xw" /> &nbsp;&nbsp; 无座 </td> </tr>
+						<tr>	<td> <input type="checkbox" name="xw" /> &nbsp;&nbsp; 软卧 </td> </tr>
+						<tr>	<td> <input type="checkbox" name="xw" /> &nbsp;&nbsp; 动卧 </td> </tr>
+						<tr>	<td> <input type="checkbox" name="xw" /> &nbsp;&nbsp; 软座 </td> </tr>
+						<tr>	<td> <input type="checkbox" name="xw" /> &nbsp;&nbsp; 商务座 </td> </tr>
+						<tr>	<td> <input type="checkbox" name="xw" /> &nbsp;&nbsp; 特等座 </td> </tr>
+						<tr>	<td> <input type="checkbox" name="xw" /> &nbsp;&nbsp; 高级软卧 </td> </tr>
+						<tr>	<td> <input type="checkbox" name="xw" /> &nbsp;&nbsp; 其他 </td> </tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="col-md-3">
+				<table class="table table-bordered table-condensed">
+					<caption>已选车次</caption>
+					<thead>
+					<tr>
+						<th>车次</th>
+					</tr>
+					</thead>
+					<tbody>
+
+					</tbody>
+				</table>
+
+
+			</div>
+			<div class="col-md-3">
+				<table class="table table-bordered table-condensed">
+					<caption>设置</caption>
+					<tbody>
+					<tr> <td> <input type="checkbox" name="xw" />  修改间隔 <input type="number" value="3000" />  </td> </tr>
+					</tbody>
+				</table>
+
+			</div>
+		</div>
+
+
 	</div>
+
+
 
 	<script th:src="@{/bootstrap/ie10-viewport-bug-workaround.js}"></script>
 	<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
@@ -91,6 +159,7 @@
 	<script th:src="@{/12306/stations_data.js}"></script>
 	<script th:src="@{/ticket/bsSuggest.js}"></script>
 	<script th:src="@{/ticket/querytrain.js}"></script>
+	<script th:src="@{/ticket/getPassenger.js}"></script>
 
 
 	<script th:inline="javascript">

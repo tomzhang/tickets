@@ -6,6 +6,7 @@ import java.util.Map;
 public class CookiesContent {
     public static String RAIL_EXPIRATION =null;
     public static String RAIL_DEVICEID = null;
+    public static String NEWAPPTK =null;
 
     public static Map getCookMap(){
         Map<String, Object> cookMap = new HashMap();

@@ -110,6 +110,7 @@ public class LoginServiceImpl implements LoginService {
         }
 
         String newapptk = resutUamtkMap.get("newapptk").toString();
+        CookiesContent.NEWAPPTK = newapptk;
         Map<String,Object> uamauthclientMap = new HashMap();
         uamauthclientMap.put("tk", newapptk);
         String url_uamauthclient = "https://kyfw.12306.cn/otn/uamauthclient";

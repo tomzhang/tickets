@@ -1,7 +1,9 @@
 package com.tickets.tickets.controller;
 
+import com.tickets.tickets.domain.PassengerVO;
 import com.tickets.tickets.domain.TrainInfoVO;
 import com.tickets.tickets.service.LoginService;
+import com.tickets.tickets.service.TicketPassengerService;
 import com.tickets.tickets.service.TicketService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -29,6 +32,8 @@ public class TicketController {
 	private LoginService loginService;
 	@Autowired
 	private TicketService ticketService;
+	@Autowired
+	private TicketPassengerService ticketPassengerService;
 	
 	@RequestMapping("/index")
 	public String index() {
@@ -89,4 +94,13 @@ public class TicketController {
 		return ticketService.query( fromStation, fromStation_code,toStation, toStation_code, train_date);
 	}
 
+	/**
+	 * 获取联系人
+	 * @return
+	 */
+	@RequestMapping("/getPassengerDTOs")
+	@ResponseBody
+	public List<PassengerVO> getPassengerDTOs(){
+		return  ticketPassengerService.getPassengerDTOs();
+	}
 }
