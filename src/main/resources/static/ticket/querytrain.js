@@ -1,3 +1,6 @@
+
+
+
 function queryTrains() {
 
     var fromStation= $("#from_station").attr("alt");
@@ -23,8 +26,9 @@ function queryTrains() {
             var html="<tbody>";
             $(trainLineInfos).each(function (index,obj) {
                // alert(obj.from_station_y_name);
+                var station_train_code = obj.station_train_code;
                 html +="<tr>";
-                html +="<td> "+obj.station_train_code +" </td>";
+                html +="<td id='station_train_code'> "+ station_train_code +" </td>";
                 html +="<td> "+obj.from_station_y_name +" </td>";
                 html +="<td> "+obj.to_station_y_name +" </td>";
                 html +="<td> "+obj.duration +" </td>";
@@ -40,6 +44,7 @@ function queryTrains() {
                 html +="<td> "+obj.wz_num +" </td>";
                 html +="<td> "+obj.qt_num +" </td>";
                 html +="<td> "+obj.start_time +" </td>";
+                html +="<td> <a  onclick=\"selecttrain('"+station_train_code+"')\" >选择</a> </td>";
 
                 html +="</tr>";
             })
@@ -51,4 +56,13 @@ function queryTrains() {
     });
 
 
+}
+
+
+function selecttrain( trainCode ,obj ) {
+    var html="";
+    html+="<tr>";
+    html+="<td>" + trainCode +"</td>";
+    html+="<tr>";
+    $("#selectcc").append(html);
 }
